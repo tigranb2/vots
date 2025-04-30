@@ -1,5 +1,5 @@
 # vots
-**V**ery **o**ptimized **t**rading **s**ystem (vots) is a trading system developed C++.
+**V**ery **o**ptimized **t**rading **s**ystem (vots) is a trading system developed in C++.
 
 Project Goals:
 - Minimize latency, maximize throughput

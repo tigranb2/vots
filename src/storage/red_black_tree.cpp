@@ -1,15 +1,16 @@
 #include "storage/red_black_tree.h"
 
-#include <cmath>
-
 namespace vots {
+
+RBTREE_TEMPLATE
+RBTREE_TYPE::RedBlackTree() : root_(nullptr){};
 
 RBTREE_TEMPLATE
 auto RBTREE_TYPE::Find(KeyType key) -> DataType * {
     Node *cur = this->root_;
     while (cur != nullptr) {
         if (cur->key_ == key) {
-            return cur->data_;
+            return &cur->data_;
         }
         if (cur->key_ < key) {
             cur = cur->left_;
@@ -47,6 +48,32 @@ void RBTREE_TYPE::Insert(KeyType key, DataType data) {
         prev->right_ = new_node;
     }
     this->InsertFix(new_node);
+}
+
+RBTREE_TEMPLATE
+auto RBTREE_TYPE::ValidateTree() -> bool {
+    using Node = typename RBTREE_TYPE::Node;
+
+    std::function<int(const Node *, bool &is_red)> validate_children = [&](const Node *node, bool &is_red) -> int {
+        if (node == nullptr) {
+            is_red = false;
+            return 1;
+        }
+        is_red = node->is_red_;
+
+        bool left_is_red = false;
+        bool right_is_red = false;
+        int left_height = validate_children(node->left_, left_is_red);
+        int right_height = validate_children(node->right_, right_is_red);
+
+        if (is_red && (left_is_red || right_is_red)) {
+            return -1;
+        }
+        return left_height == right_height ? left_height + 1 : -1;
+    };
+
+    bool is_red;
+    return validate_children(this->root_, is_red);
 }
 
 RBTREE_TEMPLATE
@@ -153,4 +180,7 @@ void RBTREE_TYPE::RotateRight(Node *node) {
     node->left_ = new_parent->right_;
     new_parent->right_ = node;
 }
+
+template class RedBlackTree<int, std::string>;
+
 }  // namespace vots

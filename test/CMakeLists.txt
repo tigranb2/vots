@@ -11,10 +11,7 @@ foreach (vots_test_source ${VOTS_TEST_SOURCES})
     string(REPLACE ".cpp" "" vots_test_name ${vots_test_filename})
 
     # Add the test target separately and as part of "make check-tests".
-    add_executable(${vots_test_name} EXCLUDE_FROM_ALL ${vots_test_source} "${PROJECT_SOURCE_DIR}/tools/backtrace.cpp")
-    add_backward(${vots_test_name})
-    add_dependencies(build-tests ${vots_test_name})
-    add_dependencies(check-tests ${vots_test_name})
+    add_executable(${vots_test_name} EXCLUDE_FROM_ALL ${vots_test_source})
 
     gtest_discover_tests(${vots_test_name}
             EXTRA_ARGS

@@ -48,6 +48,12 @@ RBTREE_TEMPLATE class RedBlackTree {
         return new Node{data, parent, nullptr, nullptr, key, true};
     }
 
+    // A node is black if it is a leaf's child (i.e. null) or if it is not marked as red
+    inline auto IsBlack(Node *node) -> bool { return node == nullptr || !node->is_red_; }
+
+    auto FindDeleteReplacement(Node *to_delete) -> Node *;
+    void ReplaceDeleted(Node *to_delete, Node *replacement);
+
     Node *root_;
 };
 

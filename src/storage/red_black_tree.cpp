@@ -294,7 +294,7 @@ void RBTREE_TYPE::RotateRight(NotNullNode node) {
 }
 
 RBTREE_TEMPLATE
-auto RBTREE_TYPE::FindDeleteReplacement(NotNullNode to_delete) -> NotNullNode  {
+auto RBTREE_TYPE::FindDeleteReplacement(NotNullNode to_delete) -> NotNullNode {
     if (to_delete->left_->is_nil_) {
         return to_delete->right_;
     }

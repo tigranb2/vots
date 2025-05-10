@@ -41,7 +41,6 @@ autoconf/autom4te.cache
 # Build artifacts
 #==============================================================================#
 #m4/
-build/
 #*.m4
 *.o
 *.lo
@@ -128,7 +127,6 @@ local.properties
 Makefile.config
 
 # build, distribute, and bins (+ python proto bindings)
-build
 .build_debug/*
 .build_release/*
 distribute/*

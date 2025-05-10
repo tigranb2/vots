@@ -25,4 +25,4 @@ jobs:
       run: make build-tests
 
     - name: Run tests
-      run: make GTEST_COLOR=1 ctest --output-on-failure -j$(nproc)
+      run: GTEST_COLOR=1 ctest --output-on-failure -j$(nproc)

@@ -11,7 +11,9 @@ namespace vots {
 TEST(RedBlackTreeInsertTest, InsertOnEmptyTree) {
     auto tree = new RedBlackTree<int, std::string>;
     tree->Insert(1, "a");
-    ASSERT_TRUE(tree->ValidateTree());
+    int count = 0;
+    ASSERT_TRUE(tree->ValidateTree(count));
+    ASSERT_EQ(count, 1);
     ASSERT_EQ(*tree->Find(1), "a");
 }
 
@@ -22,7 +24,9 @@ TEST(RedBlackTreeInsertTest, IncreasingSequentialInsert) {
 
     for (int i = 0; i < 10; ++i) {
         tree->Insert(i, vals[i]);
-        ASSERT_TRUE(tree->ValidateTree());
+        int count = 0;
+        ASSERT_TRUE(tree->ValidateTree(count));
+        ASSERT_EQ(count, i + 1);
     }
     for (int i = 0; i < 10; ++i) {
         ASSERT_EQ(*tree->Find(i), vals[i]);
@@ -36,7 +40,9 @@ TEST(RedBlackTreeInsertTest, DecreasingSequentialInsert) {
 
     for (int i = 9; i >= 0; --i) {
         tree->Insert(i, vals[i]);
-        ASSERT_TRUE(tree->ValidateTree());
+        int count = 0;
+        ASSERT_TRUE(tree->ValidateTree(count));
+        ASSERT_EQ(count, 10 - i);
     }
     for (int i = 9; i >= 0; --i) {
         ASSERT_EQ(*tree->Find(i), vals[i]);
@@ -48,7 +54,9 @@ TEST(RedBlackTreeInsertTest, IncreasingSequentialInsertLarge) {
     for (int i = 0; i < 100000; ++i) {
         tree->Insert(i, -i);
     }
-    ASSERT_TRUE(tree->ValidateTree());
+    int count = 0;
+    ASSERT_TRUE(tree->ValidateTree(count));
+    ASSERT_EQ(count, 100000);
     for (int i = 0; i < 100000; ++i) {
         ASSERT_EQ(*tree->Find(i), -i);
     }
@@ -60,7 +68,9 @@ TEST(RedBlackTreeInsertTest, DecreasingSequentialInsertLarge) {
     for (int i = 99999; i >= 0; --i) {
         tree->Insert(i, -i);
     }
-    ASSERT_TRUE(tree->ValidateTree());
+    int count = 0;
+    ASSERT_TRUE(tree->ValidateTree(count));
+    ASSERT_EQ(count, 100000);
     for (int i = 99999; i >= 0; --i) {
         ASSERT_EQ(*tree->Find(i), -i);
     }
@@ -73,7 +83,10 @@ TEST(RedBlackTreeInsertTest, RedUncle) {
     tree->Insert(1, "c");
     tree->Insert(0, "d");  // uncle 3 will be red
 
-    ASSERT_TRUE(tree->ValidateTree());
+    int count = 0;
+    ASSERT_TRUE(tree->ValidateTree(count));
+    ASSERT_EQ(count, 4);
+
     ASSERT_EQ(*tree->Find(2), "a");
     ASSERT_EQ(*tree->Find(3), "b");
     ASSERT_EQ(*tree->Find(1), "c");
@@ -88,7 +101,10 @@ TEST(RedBlackTreeInsertTest, Case4) {
     tree_left->Insert(0, "d");
     tree_left->Insert(-1, "e");  // red parent (d), left child of left child
 
-    ASSERT_TRUE(tree_left->ValidateTree());
+    int count_left = 0;
+    ASSERT_TRUE(tree_left->ValidateTree(count_left));
+    ASSERT_EQ(count_left, 5);
+
     ASSERT_EQ(*tree_left->Find(2), "a");
     ASSERT_EQ(*tree_left->Find(3), "b");
     ASSERT_EQ(*tree_left->Find(1), "c");
@@ -102,7 +118,10 @@ TEST(RedBlackTreeInsertTest, Case4) {
     tree_right->Insert(4, "d");
     tree_right->Insert(5, "e");  // red parent (d), right child of right child
 
-    ASSERT_TRUE(tree_right->ValidateTree());
+    int count_right = 0;
+    ASSERT_TRUE(tree_right->ValidateTree(count_right));
+    ASSERT_EQ(count_right, 5);
+
     ASSERT_EQ(*tree_right->Find(2), "a");
     ASSERT_EQ(*tree_right->Find(3), "b");
     ASSERT_EQ(*tree_right->Find(1), "c");
@@ -118,7 +137,10 @@ TEST(RedBlackTreeInsertTest, Case3) {
     tree_left->Insert(0, "d");
     tree_left->Insert(1, "e");  // red parent (d), right child of left child
 
-    ASSERT_TRUE(tree_left->ValidateTree());
+    int count_left = 0;
+    ASSERT_TRUE(tree_left->ValidateTree(count_left));
+    ASSERT_EQ(count_left, 5);
+
     ASSERT_EQ(*tree_left->Find(3), "a");
     ASSERT_EQ(*tree_left->Find(4), "b");
     ASSERT_EQ(*tree_left->Find(2), "c");
@@ -132,7 +154,10 @@ TEST(RedBlackTreeInsertTest, Case3) {
     tree_right->Insert(5, "d");
     tree_right->Insert(4, "e");  // red parent (d), left child of right child
 
-    ASSERT_TRUE(tree_right->ValidateTree());
+    int count_right = 0;
+    ASSERT_TRUE(tree_right->ValidateTree(count_right));
+    ASSERT_EQ(count_right, 5);
+
     ASSERT_EQ(*tree_right->Find(2), "a");
     ASSERT_EQ(*tree_right->Find(3), "b");
     ASSERT_EQ(*tree_right->Find(1), "c");
@@ -142,30 +167,31 @@ TEST(RedBlackTreeInsertTest, Case3) {
 
 TEST(RedBlackTreeInsertTest, RandomInsert) {
     auto tree = new RedBlackTree<int, int>;
+    int c = 0;
     tree->Insert(1, -1);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(7, -7);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(3, -3);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(12, -12);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(-12, 12);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(4, -4);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(0, 0);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(90, -90);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(55, -55);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(6, -6);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(9, -9);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
     tree->Insert(2, -2);
-    ASSERT_TRUE(tree->ValidateTree());
+    ASSERT_TRUE(tree->ValidateTree(c));
 
     ASSERT_EQ(*tree->Find(1), -1);
     ASSERT_EQ(*tree->Find(7), -7);
@@ -195,7 +221,10 @@ TEST(RedBlackTreeInsertTest, RandomInsertLarge) {
             tree->Insert(vec[i], -vec[i]);
         }
 
-        ASSERT_TRUE(tree->ValidateTree());
+        int count = 0;
+        ASSERT_TRUE(tree->ValidateTree(count));
+        ASSERT_EQ(count, 100000);
+
         for (int i = 0; i < size; ++i) {
             ASSERT_EQ(*tree->Find(vec[i]), -vec[i]);
         }

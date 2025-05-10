@@ -1,0 +1,24 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build Project
+      run: cd build && cmake ..
+
+    - name: Build tests
+      run: make build-tests
+
+    - name: Run tests
+      run: make test

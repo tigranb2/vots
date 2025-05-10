@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+defaults:
+  run:
+    working-directory: build
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -15,7 +19,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Build Project
-      run: cd build && cmake ..
+      run: cmake ..
 
     - name: Build tests
       run: make build-tests

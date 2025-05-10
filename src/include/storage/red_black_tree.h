@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gsl/gsl>
+
 namespace vots {
 
 #define RBTREE_TEMPLATE template <typename KeyType, typename DataType>
@@ -36,30 +38,32 @@ RBTREE_TEMPLATE class RedBlackTree {
         bool is_nil_;  // for leave's children
     };
 
-    // InsertFix restores violated tree invariants, if any are present, after an insert
-    void InsertFix(Node *node);
-    // DeleteFix restores violated tree invariants, if any are present, after a delete
-    void DeleteFix(Node *node);
+    using NotNullNode = gsl::not_null<Node *>;
 
-    void RotateLeft(Node *node);
-    void RotateRight(Node *node);
+    // InsertFix restores violated tree invariants, if any are present, after an insert
+    void InsertFix(NotNullNode node);
+    // DeleteFix restores violated tree invariants, if any are present, after a delete
+    void DeleteFix(NotNullNode node);
+
+    void RotateLeft(NotNullNode node);
+    void RotateRight(NotNullNode node);
 
     // NewNode returns a red node with the specified key, data, and parent
-    inline auto NewNode(KeyType key, DataType data, Node *parent) -> Node * {
-        Node *n = new Node{data, parent, nullptr, nullptr, key, true, false};
+    inline auto NewNode(KeyType key, DataType data, Node *parent) -> NotNullNode {
+        NotNullNode n = new Node{data, parent, nullptr, nullptr, key, true, false};
         n->left_ = NewDummyNil(n);
         n->right_ = NewDummyNil(n);
         return n;
     }
     // NewDummyNil returns a node representing a parent's NIL child (by spec., these are black)
-    inline auto NewDummyNil(Node *parent) -> Node * {
+    inline auto NewDummyNil(Node *parent) -> NotNullNode {
         return new Node{DataType{}, parent, nullptr, nullptr, KeyType{}, false, true};
     }
 
-    auto FindDeleteReplacement(Node *to_delete) -> Node *;
-    void ReplaceDeleted(Node *to_delete, Node *replacement);
+    auto FindDeleteReplacement(NotNullNode to_delete) -> NotNullNode;
+    void ReplaceDeleted(NotNullNode to_delete, NotNullNode replacement);
 
-    Node *root_;
+    NotNullNode root_;
 };
 
 }  // namespace vots

@@ -7,13 +7,14 @@ set(VOTS_LIBS
         )
 
 set(VOTS_THIRDPARTY_LIBS
-#         some-lib
+        Microsoft.GSL::GSL
         )
 
 target_link_libraries(
         vots 
         ${VOTS_LIBS}
-        ${VOTS_THIRDPARTY_LIBS})
+        ${VOTS_THIRDPARTY_LIBS}
+    )
 
 target_include_directories(
         vots PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

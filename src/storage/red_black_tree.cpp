@@ -188,7 +188,7 @@ void RBTREE_TYPE::DeleteFix(Node *node) {
     RotateFn rotate2;  // right if node is right child; left otherwise
     Child child2;
 
-    while (this->IsBlack(node) && node != this->root_) {
+    while (!node->is_red_ && node != this->root_) {
         if (node->parent_->left_ == node) {
             rotate1 = &RBTREE_TYPE::RotateLeft;
             rotate2 = &RBTREE_TYPE::RotateRight;
@@ -212,7 +212,7 @@ void RBTREE_TYPE::DeleteFix(Node *node) {
         }
 
         // black sibling with black children
-        if (this->IsBlack(sibling->left_) && this->IsBlack(sibling->right_)) {
+        if (!sibling->left_->is_red_ && !sibling->right_->is_red_) {
             sibling->is_red_ = true;
             node = node->parent_;
             continue;
@@ -220,7 +220,7 @@ void RBTREE_TYPE::DeleteFix(Node *node) {
 
         // sibling is black at least 1 red child
         Node *sibling_far_child = sibling->*child2;
-        if (this->IsBlack(sibling_far_child)) {
+        if (!sibling_far_child->is_red_) {
             Node *adjacent_child = sibling->*child1;
             adjacent_child->is_red_ = false;
             sibling->is_red_ = true;

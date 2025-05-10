@@ -30,6 +30,32 @@ set(VOTS_CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin" "/usr/local/opt/llvm/bin"
 # CTest
 enable_testing()
 
+set(CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin" "/usr/local/opt/llvm/bin" "/usr/local/opt/llvm@14/bin"
+        "/opt/homebrew/opt/llvm@14/bin/")
+
+# attempt to find the binary if user did not specify
+find_program(CLANG_FORMAT_BIN
+        NAMES clang-format clang-format-14
+        HINTS ${CLANG_SEARCH_PATH})
+
+if("${CLANG_FORMAT_BIN}" STREQUAL "CLANG_FORMAT_BIN-NOTFOUND")
+        message(WARNING "couldn't find clang-format.")
+else()
+        message(STATUS "found clang-format at ${CLANG_FORMAT_BIN}")
+endif()
+
+# attempt to find the binary if user did not specify
+find_program(CLANG_TIDY_BIN
+        NAMES clang-tidy clang-tidy-14
+        HINTS ${CLANG_SEARCH_PATH})
+
+if("${CLANG_TIDY_BIN}" STREQUAL "CLANG_TIDY_BIN-NOTFOUND")
+        message(WARNING "couldn't find clang-tidy.")
+else()
+        # Output compile_commands.json
+        set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+        message(STATUS "found clang-tidy at ${CLANG_TIDY_BIN}")
+endif()
 
 # COMPILER SETUP
 if(NOT DEFINED VOTS_SANITIZER)
@@ -79,3 +105,44 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_dependencies(gtest vots) 
+
+# Custom make targets
+add_custom_target(lint
+    COMMAND ${CMAKE_SOURCE_DIR}/run_clang_tidy.py 
+        -clang-tidy-binary ${CLANG_TIDY_BIN} 
+        -p ${CMAKE_BINARY_DIR} 
+        ${CMAKE_SOURCE_DIR}/src 
+        ${CMAKE_SOURCE_DIR}/test
+)
+add_custom_target(lint-fix
+        ${CMAKE_SOURCE_DIR}/run_clang_tidy.py 
+        -clang-tidy-binary ${CLANG_TIDY_BIN} 
+        -p ${CMAKE_BINARY_DIR} 
+        -fix 
+        ${CMAKE_SOURCE_DIR}/src 
+        ${CMAKE_SOURCE_DIR}/test
+)
+
+string(CONCAT VOTS_FORMAT_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src,"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test,"
+)
+
+add_custom_target(format ${CMAKE_SOURCE_DIR}/run_clang_format.py
+        ${CLANG_FORMAT_BIN}
+        ${CMAKE_SOURCE_DIR}/format_exclusions.txt
+        --source_dirs
+        ${VOTS_FORMAT_DIRS}
+        --quiet
+)
+
+add_custom_target(format-fix ${CMAKE_SOURCE_DIR}/run_clang_format.py
+        ${CLANG_FORMAT_BIN}
+        ${CMAKE_SOURCE_DIR}/format_exclusions.txt
+        --source_dirs
+        ${VOTS_FORMAT_DIRS}
+        --fix
+        --quiet
+)
+
+

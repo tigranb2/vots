@@ -29,5 +29,13 @@ foreach (vots_test_source ${VOTS_TEST_SOURCES})
             PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
             COMMAND ${vots_test_name}
-            )
+    )
+
+    list(APPEND ALL_VOTS_TEST_TARGETS ${vots_test_name})
 endforeach ()
+
+# Set catch-all test run
+add_custom_target(
+  build-tests
+  DEPENDS ${ALL_VOTS_TEST_TARGETS}
+)

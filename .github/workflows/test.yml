@@ -1,0 +1,28 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+defaults:
+  run:
+    working-directory: build
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build Project
+      run: cmake ..
+
+    - name: Build tests
+      run: make build-tests
+
+    - name: Run tests
+      run: GTEST_COLOR=1 ctest --output-on-failure -j$(nproc)

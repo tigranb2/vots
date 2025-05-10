@@ -1,8 +1,6 @@
 #include "storage/red_black_tree.h"
 
 #include <functional>
-#include <iostream>
-#include <ostream>
 #include <string>
 
 namespace vots {

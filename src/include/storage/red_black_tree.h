@@ -23,7 +23,7 @@ RBTREE_TEMPLATE class RedBlackTree {
     void Insert(KeyType key, DataType data);
     void Delete(KeyType key);
 
-    auto ValidateTree() -> bool;
+    auto ValidateTree(int &count) -> bool;
 
    private:
     struct Node {
@@ -33,6 +33,7 @@ RBTREE_TEMPLATE class RedBlackTree {
         Node *right_;
         KeyType key_;
         bool is_red_;
+        bool is_nil_;  // for leave's children
     };
 
     // InsertFix restores violated tree invariants, if any are present, after an insert
@@ -45,8 +46,21 @@ RBTREE_TEMPLATE class RedBlackTree {
 
     // NewNode returns a red node with the specified key, data, and parent
     inline auto NewNode(KeyType key, DataType data, Node *parent) -> Node * {
-        return new Node{data, parent, nullptr, nullptr, key, true};
+        Node *n = new Node{data, parent, nullptr, nullptr, key, true, false};
+        n->left_ = NewDummyNil(n);
+        n->right_ = NewDummyNil(n);
+        return n;
     }
+    // NewDummyNil returns a node representing a parent's NIL child (by spec., these are black)
+    inline auto NewDummyNil(Node *parent) -> Node * {
+        return new Node{DataType{}, parent, nullptr, nullptr, KeyType{}, false, true};
+    }
+
+    // A node is black if it is a leaf's child (i.e. null) or if it is not marked as red
+    inline auto IsBlack(Node *node) -> bool { return node == nullptr || !node->is_red_; }
+
+    auto FindDeleteReplacement(Node *to_delete) -> Node *;
+    void ReplaceDeleted(Node *to_delete, Node *replacement);
 
     Node *root_;
 };

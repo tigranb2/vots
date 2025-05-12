@@ -9,7 +9,7 @@
 namespace vots {
 
 TEST(RedBlackTreeInsertTest, InsertOnEmptyTree) {
-    auto tree = RedBlackTree<int, std::string>;
+    auto tree = RedBlackTree<int, std::string>();
     tree.Insert(1, "a");
     int count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
@@ -18,7 +18,7 @@ TEST(RedBlackTreeInsertTest, InsertOnEmptyTree) {
 }
 
 TEST(RedBlackTreeInsertTest, IncreasingSequentialInsert) {
-    auto tree = RedBlackTree<int, std::string>;
+    auto tree = RedBlackTree<int, std::string>();
 
     std::vector<std::string> vals = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
 
@@ -34,7 +34,7 @@ TEST(RedBlackTreeInsertTest, IncreasingSequentialInsert) {
 }
 
 TEST(RedBlackTreeInsertTest, DecreasingSequentialInsert) {
-    auto tree = RedBlackTree<int, std::string>;
+    auto tree = RedBlackTree<int, std::string>();
 
     std::vector<std::string> vals = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
 
@@ -50,7 +50,7 @@ TEST(RedBlackTreeInsertTest, DecreasingSequentialInsert) {
 }
 
 TEST(RedBlackTreeInsertTest, IncreasingSequentialInsertLarge) {
-    auto tree = RedBlackTree<int, int>;
+    auto tree = RedBlackTree<int, int>();
     for (int i = 0; i < 100000; ++i) {
         tree.Insert(i, -i);
     }
@@ -63,7 +63,7 @@ TEST(RedBlackTreeInsertTest, IncreasingSequentialInsertLarge) {
 }
 
 TEST(RedBlackTreeInsertTest, DecreasingSequentialInsertLarge) {
-    auto tree = RedBlackTree<int, int>;
+    auto tree = RedBlackTree<int, int>();
 
     for (int i = 99999; i >= 0; --i) {
         tree.Insert(i, -i);
@@ -77,7 +77,7 @@ TEST(RedBlackTreeInsertTest, DecreasingSequentialInsertLarge) {
 }
 
 TEST(RedBlackTreeInsertTest, RedUncle) {
-    auto tree = RedBlackTree<int, std::string>;
+    auto tree = RedBlackTree<int, std::string>();
     tree.Insert(2, "a");
     tree.Insert(3, "b");
     tree.Insert(1, "c");
@@ -94,7 +94,7 @@ TEST(RedBlackTreeInsertTest, RedUncle) {
 }
 
 TEST(RedBlackTreeInsertTest, Case4) {
-    auto tree_left = RedBlackTree<int, std::string>;
+    auto tree_left = RedBlackTree<int, std::string>();
     tree_left.Insert(2, "a");
     tree_left.Insert(3, "b");
     tree_left.Insert(1, "c");
@@ -111,7 +111,7 @@ TEST(RedBlackTreeInsertTest, Case4) {
     ASSERT_EQ(*tree_left.Find(0), "d");
     ASSERT_EQ(*tree_left.Find(-1), "e");
 
-    auto tree_right = RedBlackTree<int, std::string>;
+    auto tree_right = RedBlackTree<int, std::string>();
     tree_right.Insert(2, "a");
     tree_right.Insert(3, "b");
     tree_right.Insert(1, "c");
@@ -130,7 +130,7 @@ TEST(RedBlackTreeInsertTest, Case4) {
 }
 
 TEST(RedBlackTreeInsertTest, Case3) {
-    auto tree_left = RedBlackTree<int, std::string>;
+    auto tree_left = RedBlackTree<int, std::string>();
     tree_left.Insert(3, "a");
     tree_left.Insert(4, "b");
     tree_left.Insert(2, "c");
@@ -147,7 +147,7 @@ TEST(RedBlackTreeInsertTest, Case3) {
     ASSERT_EQ(*tree_left.Find(0), "d");
     ASSERT_EQ(*tree_left.Find(1), "e");
 
-    auto tree_right = RedBlackTree<int, std::string>;
+    auto tree_right = RedBlackTree<int, std::string>();
     tree_right.Insert(2, "a");
     tree_right.Insert(3, "b");
     tree_right.Insert(1, "c");
@@ -166,7 +166,7 @@ TEST(RedBlackTreeInsertTest, Case3) {
 }
 
 TEST(RedBlackTreeInsertTest, RandomInsert) {
-    auto tree = RedBlackTree<int, int>;
+    auto tree = RedBlackTree<int, int>();
     int c = 0;
     tree.Insert(1, -1);
     ASSERT_TRUE(tree.ValidateTree(c));
@@ -208,7 +208,7 @@ TEST(RedBlackTreeInsertTest, RandomInsert) {
 
 TEST(RedBlackTreeInsertTest, RandomInsertLarge) {
     for (int i = 0; i < 5; ++i) {
-        auto tree = RedBlackTree<int, int>;
+        auto tree = RedBlackTree<int, int>();
 
         std::vector<int> vec(100000);
         std::iota(vec.begin(), vec.end(), 0);  // Fill with 0 to 99999

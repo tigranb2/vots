@@ -83,7 +83,7 @@ RBTREE_TEMPLATE class RedBlackTree {
     }
 
     auto FindDeleteReplacement(NotNullNode to_delete) -> std::unique_ptr<Node> &;
-    void ReplaceDeleted(NotNullNode to_delete, std::unique_ptr<Node> &replacement);
+    void ReplaceDeleted(NotNullNode to_delete, std::unique_ptr<Node> *replacement);
 
     std::unique_ptr<Node> root_;
 };

@@ -73,17 +73,18 @@ void RBTREE_TYPE::Delete(KeyType key) {
     }
 
     std::unique_ptr<Node> &replacement = this->FindDeleteReplacement(cur);
-    std::unique_ptr<Node> *fix_candidate = &replacement;
+    NotNullNode fix_candidate = replacement.get();
     bool should_fix = !cur->is_red_;  // run DeleteFix if replaced node is black
     if (!cur->left_->is_nil_ && !cur->right_->is_nil_) {
-        fix_candidate = &replacement->right_;
+        fix_candidate = replacement->right_.get();
         should_fix = !replacement->is_red_;  // in this case, run DeleteFix if replacing node was black
         replacement->is_red_ = cur->is_red_;
     }
 
-    this->ReplaceDeleted(cur, replacement);
+    this->ReplaceDeleted(cur, &replacement);
     if (should_fix) {
-        this->DeleteFix(fix_candidate);
+        std::unique_ptr<Node> &fc_unique_ptr = this->GetNodeOwner(fix_candidate);
+        this->DeleteFix(&fc_unique_ptr);
     }
 }
 
@@ -108,7 +109,6 @@ auto RBTREE_TYPE::ValidateTree(int &count) -> bool {
         }
         return left_height + (is_red ? 0 : 1);
     };
-
     bool is_red;
     return validate_children(this->root_, is_red, count) != -1;
 }
@@ -126,7 +126,8 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
 
     // Red node's parent cannot be red
     while ((*node)->parent_ != nullptr && (*node)->parent_->is_red_) {
-        if ((*node)->parent_->left_ == (*node)) {
+        NotNullNode grandparent = (*node)->parent_->parent_;
+        if (grandparent->left_.get() == (*node)->parent_) {
             rotate1 = &RBTREE_TYPE::RotateLeft;
             rotate2 = &RBTREE_TYPE::RotateRight;
 
@@ -141,7 +142,6 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
         }
 
         // Cannot be nullptr since node->parent_ is red and therefore not the root
-        NotNullNode grandparent = (*node)->parent_->parent_;
         NotNullNode uncle = (grandparent->*child2).get();
 
         // Red uncle --> recolor grandparent and its children
@@ -156,8 +156,10 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
         // Node *just* before grandparent in sorted order
         if ((*node)->parent_->*child2 == (*node)) {
             node = &this->GetNodeOwner((*node)->parent_);
+            NotNullNode node_ptr = node->get();
             (this->*rotate1)((*node));
-            grandparent = (*node)->parent_->parent_;
+            node = &this->GetNodeOwner(node_ptr);
+            grandparent = node_ptr->parent_->parent_;
         }
 
         // Node is grandparent's far child
@@ -310,26 +312,33 @@ auto RBTREE_TYPE::FindDeleteReplacement(NotNullNode to_delete) -> std::unique_pt
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::ReplaceDeleted(NotNullNode to_delete, std::unique_ptr<Node> &replacement) {
-    if (!replacement->is_nil_) {
+void RBTREE_TYPE::ReplaceDeleted(NotNullNode to_delete, std::unique_ptr<Node> *replacement) {
+    std::unique_ptr<Node> replacement_holder;
+    if (!(*replacement)->is_nil_) {
         // invalidate replacement's old parent info
-        NotNullNode old_parent = replacement->parent_;
-        if (old_parent->left_ == replacement) {
-            old_parent->left_ = std::move(replacement->right_);
-            old_parent->left_->parent_ = old_parent;
-        } else {
-            old_parent->right_ = std::move(replacement->right_);
-            old_parent->right_->parent_ = old_parent;
+        NotNullNode old_parent = (*replacement)->parent_;
+        if (old_parent != to_delete) {
+            if (old_parent->left_ == (*replacement)) {
+                replacement_holder = std::move(old_parent->left_);
+                replacement = &replacement_holder;
+                old_parent->left_ = std::move((*replacement)->right_);
+                old_parent->left_->parent_ = old_parent;
+            } else {
+                replacement_holder = std::move(old_parent->right_);
+                replacement = &replacement_holder;
+                old_parent->right_ = std::move((*replacement)->right_);
+                old_parent->right_->parent_ = old_parent;
+            }
         }
 
         // update replacement's children info
-        if (to_delete->left_ != replacement) {
-            replacement->left_ = std::move(to_delete->left_);
-            replacement->left_->parent_ = replacement.get();
+        if (to_delete->left_ != (*replacement)) {
+            (*replacement)->left_ = std::move(to_delete->left_);
+            (*replacement)->left_->parent_ = (*replacement).get();
         }
-        if (to_delete->right_ != replacement) {
-            replacement->right_ = std::move(to_delete->right_);
-            replacement->right_->parent_ = replacement.get();
+        if (to_delete->right_ != (*replacement)) {
+            (*replacement)->right_ = std::move(to_delete->right_);
+            (*replacement)->right_->parent_ = (*replacement).get();
         }
     }
 
@@ -337,14 +346,14 @@ void RBTREE_TYPE::ReplaceDeleted(NotNullNode to_delete, std::unique_ptr<Node> &r
     Node *new_parent = to_delete->parent_;
     if (new_parent != nullptr) {
         if (new_parent->left_.get() == to_delete) {
-            new_parent->left_ = std::move(replacement);
+            new_parent->left_ = std::move((*replacement));
             new_parent->left_->parent_ = new_parent;
         } else {
-            new_parent->right_ = std::move(replacement);
+            new_parent->right_ = std::move((*replacement));
             new_parent->right_->parent_ = new_parent;
         }
     } else {
-        this->root_ = std::move(replacement);
+        this->root_ = std::move((*replacement));
         this->root_->parent_ = nullptr;
     }
 }

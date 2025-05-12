@@ -46,7 +46,7 @@ void RBTREE_TYPE::Insert(KeyType key, DataType data) {
         }
     }
 
-    std::unique_ptr<Node> new_node = std::move(this->NewNode(key, data, prev));
+    std::unique_ptr<Node> new_node = this->NewNode(key, data, prev);
     if (key < prev->key_) {
         prev->left_ = std::move(new_node);
         this->InsertFix(&prev->left_);
@@ -118,7 +118,6 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
     using Child = std::unique_ptr<Node> Node::*;
 
     RotateFn rotate1;  // left if node is left child; right otherwise
-    Child child1;
 
     RotateFn rotate2;  // right if node is right child; left otherwise
     Child child2;
@@ -129,14 +128,10 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
         if (grandparent->left_.get() == (*node)->parent_) {
             rotate1 = &RBTREE_TYPE::RotateLeft;
             rotate2 = &RBTREE_TYPE::RotateRight;
-
-            child1 = &Node::left_;
             child2 = &Node::right_;
         } else {
             rotate1 = &RBTREE_TYPE::RotateRight;
             rotate2 = &RBTREE_TYPE::RotateLeft;
-
-            child1 = &Node::right_;
             child2 = &Node::left_;
         }
 

@@ -1,24 +1,26 @@
 #include "storage/red_black_tree.h"
 
+#include <cassert>
 #include <functional>
 #include <string>
+#include <utility>
 
 namespace vots {
 
 RBTREE_TEMPLATE
-RBTREE_TYPE::RedBlackTree() : root_(NewDummyNil(nullptr)){};
+RBTREE_TYPE::RedBlackTree() : root_(std::move(NewDummyNil(nullptr))){};
 
 RBTREE_TEMPLATE
 auto RBTREE_TYPE::Find(KeyType key) -> DataType * {
-    Node *cur = this->root_;
+    NotNullNode cur = this->root_.get();
     while (!cur->is_nil_) {
         if (cur->key_ == key) {
             return &cur->data_;
         }
         if (key < cur->key_) {
-            cur = cur->left_;
+            cur = cur->left_.get();
         } else {
-            cur = cur->right_;
+            cur = cur->right_.get();
         }
     }
     return nullptr;
@@ -33,24 +35,25 @@ void RBTREE_TYPE::Insert(KeyType key, DataType data) {
     }
 
     Node *prev = nullptr;
-    Node *cur = this->root_;
+    NotNullNode cur = this->root_.get();
     while (!cur->is_nil_) {
         prev = cur;
 
         if (key < cur->key_) {
-            cur = cur->left_;
+            cur = cur->left_.get();
         } else {
-            cur = cur->right_;
+            cur = cur->right_.get();
         }
     }
 
-    Node *new_node = this->NewNode(key, data, prev);
+    std::unique_ptr<Node> new_node = this->NewNode(key, data, prev);
     if (key < prev->key_) {
-        prev->left_ = new_node;
+        prev->left_ = std::move(new_node);
+        this->InsertFix(&prev->left_);
     } else {
-        prev->right_ = new_node;
+        prev->right_ = std::move(new_node);
+        this->InsertFix(&prev->right_);
     }
-    this->InsertFix(new_node);
 }
 
 RBTREE_TEMPLATE
@@ -59,44 +62,35 @@ void RBTREE_TYPE::Delete(KeyType key) {
         return;
     }
 
-    Node *cur = this->root_;
+    NotNullNode cur = this->root_.get();
     while (cur->key_ != key) {
         if (key < cur->key_) {
-            cur = cur->left_;
+            cur = cur->left_.get();
         } else {
-            cur = cur->right_;
+            cur = cur->right_.get();
         }
     }
 
-    Node *replacement = this->FindDeleteReplacement(cur);
-    Node *fix_candidate = replacement;
+    std::unique_ptr<Node> &replacement = this->FindDeleteReplacement(cur);
+    NotNullNode fix_candidate = replacement.get();
     bool should_fix = !cur->is_red_;  // run DeleteFix if replaced node is black
-    if (cur == this->root_) {
-        this->root_ = replacement;
-
-        // Check if tree is now empty; if so, return
-        if (replacement->is_nil_) {
-            return;
-        }
-    }
     if (!cur->left_->is_nil_ && !cur->right_->is_nil_) {
-        fix_candidate = replacement->right_;
+        fix_candidate = replacement->right_.get();
         should_fix = !replacement->is_red_;  // in this case, run DeleteFix if replacing node was black
         replacement->is_red_ = cur->is_red_;
     }
 
-    this->ReplaceDeleted(cur, replacement);
+    this->ReplaceDeleted(cur, &replacement);
     if (should_fix) {
-        this->DeleteFix(fix_candidate);
+        std::unique_ptr<Node> &fc_unique_ptr = this->GetNodeOwner(fix_candidate);
+        this->DeleteFix(&fc_unique_ptr);
     }
 }
 
 RBTREE_TEMPLATE
 auto RBTREE_TYPE::ValidateTree(int &count) -> bool {
-    using Node = typename RBTREE_TYPE::Node;
-
-    std::function<int(const Node *, bool &is_red, int &count)> validate_children = [&](const Node *node, bool &is_red,
-                                                                                       int &count) -> int {
+    std::function<int(const std::unique_ptr<Node> &, bool &is_red, int &count)> validate_children =
+        [&](const std::unique_ptr<Node> &node, bool &is_red, int &count) -> int {
         if (node->is_nil_) {
             is_red = false;
             return 1;
@@ -114,73 +108,67 @@ auto RBTREE_TYPE::ValidateTree(int &count) -> bool {
         }
         return left_height + (is_red ? 0 : 1);
     };
-
     bool is_red;
     return validate_children(this->root_, is_red, count) != -1;
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::InsertFix(Node *node) {
+void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
+    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> &node);
+    using Child = std::unique_ptr<Node> Node::*;
+
+    RotateFn rotate1;  // left if node is left child; right otherwise
+
+    RotateFn rotate2;  // right if node is right child; left otherwise
+    Child child2;
+
     // Red node's parent cannot be red
-    while (node->parent_ != nullptr && node->parent_->is_red_) {
-        // Cannot be nullptr since node->parent_'s red & root must be black
-        Node *grandparent = node->parent_->parent_;
-        Node *uncle;
-        if (node->parent_ == grandparent->left_) {
-            uncle = grandparent->right_;
-
-            // Red uncle --> recolor grandparent and its children
-            if (!uncle->is_nil_ && uncle->is_red_) {
-                uncle->is_red_ = false;
-                node->parent_->is_red_ = false;
-                grandparent->is_red_ = true;
-                node = grandparent;
-                continue;
-            }
-
-            // Node *just* before grandparent in sorted order
-            if (node->parent_->right_ == node) {
-                node = node->parent_;
-                this->RotateLeft(node);
-                grandparent = node->parent_->parent_;
-            }
-
-            // Node is left child of grandparent's left child
-            node->parent_->is_red_ = false;
-            grandparent->is_red_ = true;
-            RotateRight(grandparent);
+    while ((*node)->parent_ != nullptr && (*node)->parent_->is_red_) {
+        NotNullNode grandparent = (*node)->parent_->parent_;
+        if (grandparent->left_.get() == (*node)->parent_) {
+            rotate1 = &RBTREE_TYPE::RotateLeft;
+            rotate2 = &RBTREE_TYPE::RotateRight;
+            child2 = &Node::right_;
         } else {
-            uncle = grandparent->left_;
-
-            // Red uncle --> recolor grandparent and its children
-            if (!uncle->is_nil_ && uncle->is_red_) {
-                uncle->is_red_ = false;
-                node->parent_->is_red_ = false;
-                grandparent->is_red_ = true;
-                node = grandparent;
-                continue;
-            }
-
-            // Node *just* after grandparent in sorted order
-            if (node->parent_->left_ == node) {
-                node = node->parent_;
-                this->RotateRight(node);
-                grandparent = node->parent_->parent_;
-            }
-
-            // Node is right child of grandparent's right child
-            node->parent_->is_red_ = false;
-            grandparent->is_red_ = true;
-            RotateLeft(grandparent);
+            rotate1 = &RBTREE_TYPE::RotateRight;
+            rotate2 = &RBTREE_TYPE::RotateLeft;
+            child2 = &Node::left_;
         }
+
+        // Cannot be nullptr since node->parent_ is red and therefore not the root
+        NotNullNode uncle = (grandparent->*child2).get();
+
+        // Red uncle --> recolor grandparent and its children
+        if (!uncle->is_nil_ && uncle->is_red_) {
+            uncle->is_red_ = false;
+            (*node)->parent_->is_red_ = false;
+            grandparent->is_red_ = true;
+            node = &this->GetNodeOwner(grandparent);
+            continue;
+        }
+
+        // Node *just* before grandparent in sorted order
+        if ((*node)->parent_->*child2 == (*node)) {
+            node = &this->GetNodeOwner((*node)->parent_);
+            NotNullNode node_ptr = node->get();
+            (this->*rotate1)((*node));
+            node = &this->GetNodeOwner(node_ptr);
+            grandparent = node_ptr->parent_->parent_;
+        }
+
+        // Node is grandparent's far child
+        (*node)->parent_->is_red_ = false;
+        grandparent->is_red_ = true;
+        std::unique_ptr<Node> &gp_unique_ptr = this->GetNodeOwner(grandparent);
+        (this->*rotate2)(gp_unique_ptr);
     }
     this->root_->is_red_ = false;
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::DeleteFix(Node *node) {
-    using RotateFn = void (RBTREE_TYPE::*)(Node *);
-    using Child = Node *Node::*;
+void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
+    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> &node);
+    using Child = std::unique_ptr<Node> Node::*;
 
     RotateFn rotate1;  // left if node is left child; right otherwise
     Child child1;
@@ -188,8 +176,8 @@ void RBTREE_TYPE::DeleteFix(Node *node) {
     RotateFn rotate2;  // right if node is right child; left otherwise
     Child child2;
 
-    while (this->IsBlack(node) && node != this->root_) {
-        if (node->parent_->left_ == node) {
+    while (!(*node)->is_red_ && (*node) != this->root_) {
+        if ((*node)->parent_->left_ == (*node)) {
             rotate1 = &RBTREE_TYPE::RotateLeft;
             rotate2 = &RBTREE_TYPE::RotateRight;
 
@@ -203,100 +191,108 @@ void RBTREE_TYPE::DeleteFix(Node *node) {
             child2 = &Node::left_;
         }
 
-        Node *sibling = node->parent_->*child2;
-        if (sibling->is_red_) {
-            sibling->is_red_ = false;
-            node->parent_->is_red_ = true;
-            (this->*rotate1)(node->parent_);  // rotate parent in the direction of `node`
-            sibling = node->parent_->*child2;
+        std::unique_ptr<Node> *sibling = &((*node)->parent_->*child2);
+        if ((*sibling)->is_red_) {
+            (*sibling)->is_red_ = false;
+            (*node)->parent_->is_red_ = true;
+            std::unique_ptr<Node> &p_unique_ptr = this->GetNodeOwner((*node)->parent_);
+            (this->*rotate1)(p_unique_ptr);  // rotate parent in the direction of `node`
+            sibling = &((*node)->parent_->*child2);
         }
 
         // black sibling with black children
-        if (this->IsBlack(sibling->left_) && this->IsBlack(sibling->right_)) {
-            sibling->is_red_ = true;
-            node = node->parent_;
+        if (!(*sibling)->left_->is_red_ && !(*sibling)->right_->is_red_) {
+            (*sibling)->is_red_ = true;
+            node = &this->GetNodeOwner((*node)->parent_);
             continue;
         }
 
         // sibling is black at least 1 red child
-        Node *sibling_far_child = sibling->*child2;
-        if (this->IsBlack(sibling_far_child)) {
-            Node *adjacent_child = sibling->*child1;
+        std::unique_ptr<Node> *sibling_far_child = &(sibling->get()->*child2);
+        if (!(*sibling_far_child)->is_red_) {
+            std::unique_ptr<Node> &adjacent_child = sibling->get()->*child1;
             adjacent_child->is_red_ = false;
-            sibling->is_red_ = true;
-            (this->*rotate2)(sibling);  // rotate sibling in direction opposite of `node`
-            sibling = node->parent_->*child2;
+            (*sibling)->is_red_ = true;
+            (this->*rotate2)((*sibling));  // rotate sibling in direction opposite of `node`
+            sibling = &((*node)->parent_->*child2);
         }
 
-        sibling->is_red_ = node->parent_->is_red_;
-        node->parent_->is_red_ = false;
-        sibling_far_child = sibling->*child2;
-        sibling_far_child->is_red_ = false;
-        (this->*rotate1)(node->parent_);  // rotate parent in the direction of `node`
-        node = this->root_;
+        assert(*sibling);
+        assert((*sibling).get());
+
+        (*sibling)->is_red_ = (*node)->parent_->is_red_;
+        (*node)->parent_->is_red_ = false;
+        sibling_far_child = &(sibling->get()->*child2);
+        (*sibling_far_child)->is_red_ = false;
+        std::unique_ptr<Node> &p_unique_ptr = this->GetNodeOwner((*node)->parent_);
+        (this->*rotate1)(p_unique_ptr);  // rotate parent in the direction of `node`
+        node = &this->root_;
     }
-    node->is_red_ = false;
+    (*node)->is_red_ = false;
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::RotateLeft(Node *node) {
-    // Given that the method is private, assume that neither node nor node.right
-    // are nullptr
-    Node *new_parent = node->right_;
+void RBTREE_TYPE::RotateLeft(std::unique_ptr<Node> &node) {
+    std::unique_ptr<Node> new_parent = std::move(node->right_);
 
-    // Update parent's data
-    if (node == this->root_) {
-        this->root_ = new_parent;
+    // move over new_parent's old left child
+    node->right_ = std::move(new_parent->left_);
+    node->right_->parent_ = node.get();
+
+    Node *node_parent = node->parent_;
+    bool node_was_left = (node_parent != nullptr) && (node_parent->left_ == node);
+
+    // move node over to be new_parent's child
+    new_parent->left_ = std::move(node);
+    new_parent->left_->parent_ = new_parent.get();
+
+    // update new_parent's parentage
+    if (node_parent == nullptr) {
+        this->root_ = std::move(new_parent);
+        this->root_->parent_ = nullptr;
     } else {
-        if (node == node->parent_->left_) {
-            node->parent_->left_ = new_parent;
+        if (node_was_left) {
+            node_parent->left_ = std::move(new_parent);
+            node_parent->left_->parent_ = node_parent;
         } else {
-            node->parent_->right_ = new_parent;
+            node_parent->right_ = std::move(new_parent);
+            node_parent->right_->parent_ = node_parent;
         }
     }
-
-    // Update parentage
-    new_parent->parent_ = node->parent_;
-    node->parent_ = new_parent;
-    if (new_parent->left_) {
-        new_parent->left_->parent_ = node;
-    }
-
-    // Update children
-    node->right_ = new_parent->left_;
-    new_parent->left_ = node;
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::RotateRight(Node *node) {
-    // Given that the method is private, assume that neither node nor node.left are nullptr
-    Node *new_parent = node->left_;
+void RBTREE_TYPE::RotateRight(std::unique_ptr<Node> &node) {
+    std::unique_ptr<Node> new_parent = std::move(node->left_);
 
-    // Update parent's data
-    if (node == this->root_) {
-        this->root_ = new_parent;
+    // move over new_parent's old right child
+    node->left_ = std::move(new_parent->right_);
+    node->left_->parent_ = node.get();
+
+    Node *node_parent = node->parent_;
+    bool node_was_left = (node_parent != nullptr) && (node_parent->left_ == node);
+
+    // move node over to be new_parent's child
+    new_parent->right_ = std::move(node);
+    new_parent->right_->parent_ = new_parent.get();
+
+    // update new_parent's parentage
+    if (node_parent == nullptr) {
+        this->root_ = std::move(new_parent);
+        this->root_->parent_ = nullptr;
     } else {
-        if (node == node->parent_->left_) {
-            node->parent_->left_ = new_parent;
+        if (node_was_left) {
+            node_parent->left_ = std::move(new_parent);
+            node_parent->left_->parent_ = node_parent;
         } else {
-            node->parent_->right_ = new_parent;
+            node_parent->right_ = std::move(new_parent);
+            node_parent->right_->parent_ = node_parent;
         }
     }
-
-    // Updae parentage
-    new_parent->parent_ = node->parent_;
-    node->parent_ = new_parent;
-    if (new_parent->right_) {
-        new_parent->right_->parent_ = node;
-    }
-
-    // Update children
-    node->left_ = new_parent->right_;
-    new_parent->right_ = node;
 }
 
 RBTREE_TEMPLATE
-auto RBTREE_TYPE::FindDeleteReplacement(Node *to_delete) -> Node * {
+auto RBTREE_TYPE::FindDeleteReplacement(NotNullNode to_delete) -> std::unique_ptr<Node> & {
     if (to_delete->left_->is_nil_) {
         return to_delete->right_;
     }
@@ -305,47 +301,57 @@ auto RBTREE_TYPE::FindDeleteReplacement(Node *to_delete) -> Node * {
     }
 
     // Node's next value, in sorted order
-    Node *replacement = to_delete->right_;
-    while (!replacement->left_->is_nil_) {
-        replacement = replacement->left_;
+    std::unique_ptr<Node> *replacement = &to_delete->right_;
+    while (!(*replacement)->left_->is_nil_) {
+        replacement = &(*replacement)->left_;
     }
-    return replacement;
+    return *replacement;
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::ReplaceDeleted(Node *to_delete, Node *replacement) {
-    // update replacement's new parent info
-    Node *old_parent = replacement->parent_;
-    Node *new_parent = to_delete->parent_;
-    if (new_parent != nullptr) {
-        if (new_parent->left_ == to_delete) {
-            new_parent->left_ = replacement;
-        } else {
-            new_parent->right_ = replacement;
+void RBTREE_TYPE::ReplaceDeleted(NotNullNode to_delete, std::unique_ptr<Node> *replacement) {
+    std::unique_ptr<Node> replacement_holder;
+    if (!(*replacement)->is_nil_) {
+        // invalidate replacement's old parent info
+        NotNullNode old_parent = (*replacement)->parent_;
+        if (old_parent != to_delete) {
+            if (old_parent->left_ == (*replacement)) {
+                replacement_holder = std::move(old_parent->left_);
+                replacement = &replacement_holder;
+                old_parent->left_ = std::move((*replacement)->right_);
+                old_parent->left_->parent_ = old_parent;
+            } else {
+                replacement_holder = std::move(old_parent->right_);
+                replacement = &replacement_holder;
+                old_parent->right_ = std::move((*replacement)->right_);
+                old_parent->right_->parent_ = old_parent;
+            }
+        }
+
+        // update replacement's children info
+        if (to_delete->left_ != (*replacement)) {
+            (*replacement)->left_ = std::move(to_delete->left_);
+            (*replacement)->left_->parent_ = (*replacement).get();
+        }
+        if (to_delete->right_ != (*replacement)) {
+            (*replacement)->right_ = std::move(to_delete->right_);
+            (*replacement)->right_->parent_ = (*replacement).get();
         }
     }
-    replacement->parent_ = new_parent;
 
-    if (replacement->is_nil_) {
-        return;
-    }
-
-    // invalidate replacement's old parent info
-    if (old_parent->left_ == replacement) {
-        old_parent->left_ = replacement->right_;
+    // update replacement's new parent info
+    Node *new_parent = to_delete->parent_;
+    if (new_parent != nullptr) {
+        if (new_parent->left_.get() == to_delete) {
+            new_parent->left_ = std::move((*replacement));
+            new_parent->left_->parent_ = new_parent;
+        } else {
+            new_parent->right_ = std::move((*replacement));
+            new_parent->right_->parent_ = new_parent;
+        }
     } else {
-        old_parent->right_ = replacement->right_;
-    }
-    replacement->right_->parent_ = old_parent;
-
-    // update replacement's children info
-    if (to_delete->left_ != replacement) {
-        replacement->left_ = to_delete->left_;
-        replacement->left_->parent_ = replacement;
-    }
-    if (to_delete->right_ != replacement) {
-        replacement->right_ = to_delete->right_;
-        replacement->right_->parent_ = replacement;
+        this->root_ = std::move((*replacement));
+        this->root_->parent_ = nullptr;
     }
 }
 

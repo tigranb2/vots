@@ -95,17 +95,6 @@ endfunction()
 add_subdirectory(src)
 add_subdirectory(test)
 
-# Third party
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG        v1.15.2
-)
-FetchContent_MakeAvailable(googletest)
-
-add_dependencies(gtest vots) 
-
 # Custom make targets
 add_custom_target(lint
     COMMAND ${CMAKE_SOURCE_DIR}/run_clang_tidy.py 
@@ -145,4 +134,19 @@ add_custom_target(format-fix ${CMAKE_SOURCE_DIR}/run_clang_format.py
         --quiet
 )
 
+# Third party
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.15.2
+)
+FetchContent_MakeAvailable(googletest)
+add_dependencies(lint gtest vots) 
 
+FetchContent_Declare(
+    GSL
+    GIT_REPOSITORY https://github.com/microsoft/GSL.git
+    GIT_TAG        v4.2.0
+)
+FetchContent_MakeAvailable(GSL)

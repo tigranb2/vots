@@ -1,8 +1,7 @@
 #include "storage/red_black_tree.h"
 
+#include <cassert>
 #include <functional>
-#include <iostream>
-#include <ostream>
 #include <string>
 #include <utility>
 
@@ -115,7 +114,7 @@ auto RBTREE_TYPE::ValidateTree(int &count) -> bool {
 
 RBTREE_TEMPLATE
 void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
-    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> &node);
+    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> & node);
     using Child = std::unique_ptr<Node> Node::*;
 
     RotateFn rotate1;  // left if node is left child; right otherwise
@@ -173,7 +172,7 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
 
 RBTREE_TEMPLATE
 void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
-    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> &node);
+    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> & node);
     using Child = std::unique_ptr<Node> Node::*;
 
     RotateFn rotate1;  // left if node is left child; right otherwise
@@ -222,6 +221,9 @@ void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
             (this->*rotate2)((*sibling));  // rotate sibling in direction opposite of `node`
             sibling = &((*node)->parent_->*child2);
         }
+
+        assert(*sibling);
+        assert((*sibling).get());
 
         (*sibling)->is_red_ = (*node)->parent_->is_red_;
         (*node)->parent_->is_red_ = false;

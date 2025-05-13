@@ -56,7 +56,7 @@ RBTREE_TEMPLATE class RedBlackTree {
     void RotateRight(std::unique_ptr<Node> &node);
 
     // NewNode returns a red node with the specified key, data, and parent
-     auto NewNode(KeyType key, DataType data, Node *parent) -> std::unique_ptr<Node> {
+    auto NewNode(KeyType key, DataType data, Node *parent) -> std::unique_ptr<Node> {
         auto n = std::make_unique<Node>(data, parent, key, true, false);
         n->left_ = std::move(NewDummyNil(n.get()));
         n->right_ = std::move(NewDummyNil(n.get()));

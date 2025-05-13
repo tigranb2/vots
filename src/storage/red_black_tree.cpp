@@ -123,7 +123,7 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
     Child child2;
 
     // Red node's parent cannot be red
-    while ((*node)->parent_ != nullptr && (*node)->parent_->is_red_) {
+    while ((*node)->parent_ && (*node)->parent_->is_red_) {
         Node *grandparent = (*node)->parent_->parent_;
         if (grandparent->left_.get() == (*node)->parent_) {
             rotate1 = &RBTREE_TYPE::RotateLeft;
@@ -247,14 +247,14 @@ void RBTREE_TYPE::RotateLeft(std::unique_ptr<Node> &node) {
     node->right_->parent_ = node.get();
 
     Node *node_parent = node->parent_;
-    bool node_was_left = (node_parent != nullptr) && (node_parent->left_ == node);
+    bool node_was_left = node_parent && (node_parent->left_ == node);
 
     // move node over to be new_parent's child
     new_parent->left_ = std::move(node);
     new_parent->left_->parent_ = new_parent.get();
 
     // update new_parent's parentage
-    if (node_parent == nullptr) {
+    if (!node_parent) {
         this->root_ = std::move(new_parent);
         this->root_->parent_ = nullptr;
     } else {
@@ -278,14 +278,14 @@ void RBTREE_TYPE::RotateRight(std::unique_ptr<Node> &node) {
     node->left_->parent_ = node.get();
 
     Node *node_parent = node->parent_;
-    bool node_was_left = (node_parent != nullptr) && (node_parent->left_ == node);
+    bool node_was_left = node_parent && (node_parent->left_ == node);
 
     // move node over to be new_parent's child
     new_parent->right_ = std::move(node);
     new_parent->right_->parent_ = new_parent.get();
 
     // update new_parent's parentage
-    if (node_parent == nullptr) {
+    if (!node_parent) {
         this->root_ = std::move(new_parent);
         this->root_->parent_ = nullptr;
     } else {
@@ -349,7 +349,7 @@ void RBTREE_TYPE::ReplaceDeleted(Node *to_delete, std::unique_ptr<Node> *replace
 
     // update replacement's new parent info
     Node *new_parent = to_delete->parent_;
-    if (new_parent != nullptr) {
+    if (new_parent) {
         if (new_parent->left_.get() == to_delete) {
             new_parent->left_ = std::move((*replacement));
             new_parent->left_->parent_ = new_parent;

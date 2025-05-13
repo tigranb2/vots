@@ -6,7 +6,7 @@ add_library(
 
 target_link_libraries(
         vots_storage
-        Microsoft.GSL::GSL
+        # lib
     )
 
 set(ALL_OBJECT_FILES

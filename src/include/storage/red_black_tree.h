@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gsl/gsl>
+#include <memory>
 
 namespace vots {
 
@@ -47,8 +47,6 @@ RBTREE_TEMPLATE class RedBlackTree {
               is_nil_(is_nil) {}
     };
 
-    using NotNullNode = gsl::not_null<Node *>;
-
     // InsertFix restores violated tree invariants, if any are present, after an insert
     void InsertFix(std::unique_ptr<Node> *node);
     // DeleteFix restores violated tree invariants, if any are present, after a delete
@@ -58,19 +56,19 @@ RBTREE_TEMPLATE class RedBlackTree {
     void RotateRight(std::unique_ptr<Node> &node);
 
     // NewNode returns a red node with the specified key, data, and parent
-    inline auto NewNode(KeyType key, DataType data, Node *parent) -> std::unique_ptr<Node> {
+    auto NewNode(KeyType key, DataType data, Node *parent) -> std::unique_ptr<Node> {
         auto n = std::make_unique<Node>(data, parent, key, true, false);
         n->left_ = std::move(NewDummyNil(n.get()));
         n->right_ = std::move(NewDummyNil(n.get()));
         return n;
     }
     // NewDummyNil returns a node representing a parent's NIL child (by spec., these are black)
-    inline auto NewDummyNil(Node *parent) -> std::unique_ptr<Node> {
+    auto NewDummyNil(Node *parent) -> std::unique_ptr<Node> {
         return std::make_unique<Node>(DataType{}, parent, KeyType{}, false, true);
     }
 
     // GetNodeOwner returns the unique_ptr owning the provided, not_null Node pointer
-    inline auto GetNodeOwner(NotNullNode node) -> std::unique_ptr<Node> & {
+    auto GetNodeOwner(Node *node) -> std::unique_ptr<Node> & {
         Node *parent = node->parent_;
         if (parent == nullptr) {
             return this->root_;
@@ -82,8 +80,8 @@ RBTREE_TEMPLATE class RedBlackTree {
         return parent->right_;
     }
 
-    auto FindDeleteReplacement(NotNullNode to_delete) -> std::unique_ptr<Node> &;
-    void ReplaceDeleted(NotNullNode to_delete, std::unique_ptr<Node> *replacement);
+    auto FindDeleteReplacement(Node *to_delete) -> std::unique_ptr<Node> &;
+    void ReplaceDeleted(Node *to_delete, std::unique_ptr<Node> *replacement);
 
     std::unique_ptr<Node> root_;
 };

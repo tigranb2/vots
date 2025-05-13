@@ -12,7 +12,7 @@ RBTREE_TYPE::RedBlackTree() : root_(std::move(NewDummyNil(nullptr))){};
 
 RBTREE_TEMPLATE
 auto RBTREE_TYPE::Find(KeyType key) -> DataType * {
-    Node* cur = this->root_.get();
+    Node *cur = this->root_.get();
     while (!cur->is_nil_) {
         if (cur->key_ == key) {
             return &cur->data_;
@@ -35,7 +35,7 @@ void RBTREE_TYPE::Insert(KeyType key, DataType data) {
     }
 
     Node *prev = nullptr;
-    Node* cur = this->root_.get();
+    Node *cur = this->root_.get();
     while (!cur->is_nil_) {
         prev = cur;
 
@@ -62,7 +62,7 @@ void RBTREE_TYPE::Delete(KeyType key) {
         return;
     }
 
-    Node* cur = this->root_.get();
+    Node *cur = this->root_.get();
     while (cur->key_ != key) {
         if (key < cur->key_) {
             cur = cur->left_.get();
@@ -72,7 +72,7 @@ void RBTREE_TYPE::Delete(KeyType key) {
     }
 
     std::unique_ptr<Node> &replacement = this->FindDeleteReplacement(cur);
-    Node* fix_candidate = replacement.get();
+    Node *fix_candidate = replacement.get();
     bool should_fix = !cur->is_red_;  // run DeleteFix if replaced node is black
     if (!cur->left_->is_nil_ && !cur->right_->is_nil_) {
         fix_candidate = replacement->right_.get();
@@ -124,7 +124,7 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
 
     // Red node's parent cannot be red
     while ((*node)->parent_ != nullptr && (*node)->parent_->is_red_) {
-        Node* grandparent = (*node)->parent_->parent_;
+        Node *grandparent = (*node)->parent_->parent_;
         if (grandparent->left_.get() == (*node)->parent_) {
             rotate1 = &RBTREE_TYPE::RotateLeft;
             rotate2 = &RBTREE_TYPE::RotateRight;
@@ -136,7 +136,7 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
         }
 
         // Cannot be nullptr since node->parent_ is red and therefore not the root
-        Node* uncle = (grandparent->*child2).get();
+        Node *uncle = (grandparent->*child2).get();
 
         // Red uncle --> recolor grandparent and its children
         if (!uncle->is_nil_ && uncle->is_red_) {
@@ -150,7 +150,7 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
         // Node *just* before grandparent in sorted order
         if ((*node)->parent_->*child2 == (*node)) {
             node = &this->GetNodeOwner((*node)->parent_);
-            Node* node_ptr = node->get();
+            Node *node_ptr = node->get();
             (this->*rotate1)((*node));
             node = &this->GetNodeOwner(node_ptr);
             grandparent = node_ptr->parent_->parent_;
@@ -176,6 +176,7 @@ void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
     RotateFn rotate2;  // right if node is right child; left otherwise
     Child child2;
 
+    assert(node);
     assert((*node).get());
 
     while (!(*node)->is_red_ && (*node) != this->root_) {
@@ -219,6 +220,7 @@ void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
             sibling = &((*node)->parent_->*child2);
         }
 
+        assert(sibling);
         assert((*sibling).get());
 
         (*sibling)->is_red_ = (*node)->parent_->is_red_;
@@ -293,7 +295,7 @@ void RBTREE_TYPE::RotateRight(std::unique_ptr<Node> &node) {
 }
 
 RBTREE_TEMPLATE
-auto RBTREE_TYPE::FindDeleteReplacement(Node* to_delete) -> std::unique_ptr<Node> & {
+auto RBTREE_TYPE::FindDeleteReplacement(Node *to_delete) -> std::unique_ptr<Node> & {
     if (to_delete->left_->is_nil_) {
         return to_delete->right_;
     }
@@ -310,11 +312,11 @@ auto RBTREE_TYPE::FindDeleteReplacement(Node* to_delete) -> std::unique_ptr<Node
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::ReplaceDeleted(Node* to_delete, std::unique_ptr<Node> *replacement) {
+void RBTREE_TYPE::ReplaceDeleted(Node *to_delete, std::unique_ptr<Node> *replacement) {
     std::unique_ptr<Node> replacement_holder;
     if (!(*replacement)->is_nil_) {
         // invalidate replacement's old parent info
-        Node* old_parent = (*replacement)->parent_;
+        Node *old_parent = (*replacement)->parent_;
         if (old_parent != to_delete) {
             if (old_parent->left_ == (*replacement)) {
                 replacement_holder = std::move(old_parent->left_);

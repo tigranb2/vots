@@ -176,7 +176,7 @@ void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
     RotateFn rotate2;  // right if node is right child; left otherwise
     Child child2;
 
-    assert(node->get());
+    assert((*node).get());
 
     while (!(*node)->is_red_ && (*node) != this->root_) {
         if ((*node)->parent_->left_ == (*node)) {

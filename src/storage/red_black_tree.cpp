@@ -239,6 +239,7 @@ void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
 
 RBTREE_TEMPLATE
 void RBTREE_TYPE::RotateLeft(std::unique_ptr<Node> &node) {
+    assert(node.get());
     std::unique_ptr<Node> new_parent = std::move(node->right_);
 
     // move over new_parent's old left child
@@ -269,6 +270,7 @@ void RBTREE_TYPE::RotateLeft(std::unique_ptr<Node> &node) {
 
 RBTREE_TEMPLATE
 void RBTREE_TYPE::RotateRight(std::unique_ptr<Node> &node) {
+    assert(node.get());
     std::unique_ptr<Node> new_parent = std::move(node->left_);
 
     // move over new_parent's old right child

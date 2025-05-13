@@ -7,7 +7,7 @@ set(VOTS_LIBS
         )
 
 set(VOTS_THIRDPARTY_LIBS
-        Microsoft.GSL::GSL
+        # lib
         )
 
 target_link_libraries(

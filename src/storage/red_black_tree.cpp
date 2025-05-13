@@ -207,6 +207,9 @@ void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
         if (!(*sibling)->left_->is_red_ && !(*sibling)->right_->is_red_) {
             (*sibling)->is_red_ = true;
             node = &this->GetNodeOwner((*node)->parent_);
+
+            assert(node);
+            assert((*node).get());
             continue;
         }
 

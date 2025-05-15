@@ -23,9 +23,10 @@ LN_TEMPLATE class ListNode {
 
     // Add adds the new node to the end of the provide prev node. It returns a reference to the new node.
     auto Add(std::unique_ptr<ListNode> &prev, std::unique_ptr<ListNode> &new_node) -> std::unique_ptr<ListNode> &;
+
     auto Add(std::unique_ptr<ListNode> &prev, KeyType key, DataType data) -> std::unique_ptr<ListNode> &;
 
-    void Delete(std::unique_ptr<ListNode>);
+    void Delete(std::unique_ptr<ListNode> &to_delete);
 
     // GetOwner returns a pointer to the unique_ptr owning the provided ListNode pointer. If the head node is provided
     // the owner cannot be determined and a nullptr is returned instead.

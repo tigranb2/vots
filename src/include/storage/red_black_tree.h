@@ -8,7 +8,7 @@ namespace vots {
 #define RBTREE_TYPE RedBlackTree<KeyType, DataType>
 
 /*
- * RedBlackTree implements a Red-Black tree, and is used to store limit objects.
+ * RedBlackTree implements a Red-Black tree and is used to store limit objects.
  *
  * The self-balancing property of Red-Black trees ensures that the bid and ask limit trees always provide worst-case
  * O(log m) operations, where m is the size of the tree. A Red-Black tree is preferred over other self-balancing

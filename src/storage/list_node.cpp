@@ -8,26 +8,26 @@ auto LN_TYPE::Make(KeyType key, DataType data) -> std::unique_ptr<ListNode> {
 }
 
 LN_TEMPLATE
-auto LN_TYPE::Add(std::unique_ptr<ListNode> &prev, std::unique_ptr<ListNode> new_node) -> std::unique_ptr<ListNode> & {
-    new_node->prev_ = prev.get();
-    prev->next_ = std::move(new_node);
-    return prev->next_;
+auto LN_TYPE::Add(std::unique_ptr<ListNode> &new_node) -> std::unique_ptr<ListNode> & {
+    new_node->prev_ = this;
+    this->next_ = std::move(new_node);
+    return this->next_;
 }
 
 LN_TEMPLATE
-auto LN_TYPE::Add(std::unique_ptr<ListNode> &prev, KeyType key, DataType data) -> std::unique_ptr<ListNode> & {
+auto LN_TYPE::Add(KeyType key, DataType data) -> std::unique_ptr<ListNode> & {
     std::unique_ptr<ListNode> new_node = LN_TYPE::Make(key, data);
-    return this->Add(prev, new_node);
+    return this->Add(new_node);
 }
 
 LN_TEMPLATE
-void LN_TYPE::Delete(std::unique_ptr<ListNode> &to_delete) {
-    if (to_delete->next_.get()) {
-        to_delete->next_->prev_ = to_delete->prev_;
+void LN_TYPE::Delete() {
+    if (this->next_.get()) {
+        this->next_->prev_ = this->prev_;
     }
 
-    if (to_delete->prev_) {
-        to_delete->prev_->next_ = to_delete->next_;
+    if (this->prev_) {
+        this->prev_->next_ = std::move(this->next_);
     }
 }
 
@@ -35,10 +35,12 @@ void LN_TYPE::Delete(std::unique_ptr<ListNode> &to_delete) {
 // the owner cannot be determined and a nullptr is returned instead.
 LN_TEMPLATE
 auto LN_TYPE::GetOwner(ListNode *node) -> std::unique_ptr<ListNode> * {
-    if (!(*node)->prev_) {
+    if (node->prev_ == nullptr) {
         return nullptr;
     }
-    return (*node)->prev_->next_;
+    return &(node->prev_->next_);
 }
+
+template class ListNode<int, int>;
 
 }  // namespace vots

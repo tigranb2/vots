@@ -26,17 +26,17 @@ LN_TEMPLATE class ListNode {
     // Add adds the new node to the end of the provide prev node. It returns a reference to the new node.
     //
     // Neither the provided prev nor the new_node can have an underlying nullptr.
-    auto Add(std::unique_ptr<ListNode> &prev, std::unique_ptr<ListNode> new_node) -> std::unique_ptr<ListNode> &;
+    auto Add(std::unique_ptr<ListNode> &new_node) -> std::unique_ptr<ListNode> &;
 
-    auto Add(std::unique_ptr<ListNode> &prev, KeyType key, DataType data) -> std::unique_ptr<ListNode> &;
+    auto Add(KeyType key, DataType data) -> std::unique_ptr<ListNode> &;
 
     // Delete removes the ListNode from the list, consequently deleting it. If the provided node is the head node, its
     // owner is not in the list, and thus the node is removed from the list but not destructed.
-    void Delete(std::unique_ptr<ListNode> &to_delete);
+    void Delete();
 
     // GetOwner returns a pointer to the unique_ptr owning the provided ListNode pointer. If the head node is provided
     // the owner is not part of the list and thus cannot be determined, so a nullptr is returned instead.
-    auto GetOwner(ListNode *node) -> std::unique_ptr<ListNode> *;
+    static auto GetOwner(ListNode *node) -> std::unique_ptr<ListNode> *;
 
    private:
     ListNode(KeyType key, DataType data) : key_(key), data_(std::move(data)) {};

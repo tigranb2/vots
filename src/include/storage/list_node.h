@@ -30,6 +30,8 @@ LN_TEMPLATE class ListNode {
 
     auto Add(std::unique_ptr<ListNode> &prev, KeyType key, DataType data) -> std::unique_ptr<ListNode> &;
 
+    // Delete removes the ListNode from the list, consequently deleting it. If the provided node is the head node, its
+    // owner is not in the list, and thus the node is removed from the list but not destructed.
     void Delete(std::unique_ptr<ListNode> &to_delete);
 
     // GetOwner returns a pointer to the unique_ptr owning the provided ListNode pointer. If the head node is provided

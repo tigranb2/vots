@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 namespace vots {
 
@@ -37,6 +38,10 @@ LN_TEMPLATE class ListNode {
     // GetOwner returns a pointer to the unique_ptr owning the provided ListNode pointer. If the head node is provided
     // the owner is not part of the list and thus cannot be determined, so a nullptr is returned instead.
     static auto GetOwner(ListNode *node) -> std::unique_ptr<ListNode> *;
+
+    // ValidateList checks whether the list elements are in the order specified by the expected vector
+    static auto ValidateList(const std::unique_ptr<ListNode> &head,
+                             const std::vector<std::pair<KeyType, DataType>> &expected) -> bool;
 
    private:
     ListNode(KeyType key, DataType data) : key_(key), data_(std::move(data)) {};

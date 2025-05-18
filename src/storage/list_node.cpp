@@ -41,6 +41,24 @@ auto LN_TYPE::GetOwner(ListNode *node) -> std::unique_ptr<ListNode> * {
     return &(node->prev_->next_);
 }
 
+LN_TEMPLATE
+auto LN_TYPE::ValidateList(const std::unique_ptr<ListNode> &head,
+                           const std::vector<std::pair<KeyType, DataType>> &expected) -> bool {
+    ListNode *node = head.get();
+    for (const auto &expect : expected) {
+        if (node == nullptr) {
+            return false;
+        }
+
+        if (node->key_ != expect.first || node->data_ != expect.second) {
+            return false;
+        }
+
+        node = node->next_.get();
+    }
+
+    return node == nullptr;
+}
 template class ListNode<int, int>;
 
 }  // namespace vots

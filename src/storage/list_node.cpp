@@ -21,7 +21,7 @@ auto LN_TYPE::Add(KeyType key, DataType data) -> std::unique_ptr<ListNode> & {
 }
 
 LN_TEMPLATE
-void LN_TYPE::Delete() {
+void LN_TYPE::Remove() {
     if (this->next_.get()) {
         this->next_->prev_ = this->prev_;
     }

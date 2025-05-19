@@ -33,10 +33,10 @@ TEST(ListNodeAddTest, IllegalAdd) {
     ASSERT_DEATH(node1->Add(empty_node), "");
 
     node1->Add(node1);
-    ASSERT_TRUE(node1.get() == nullptr);
+    ASSERT_EQ(node1.get(), nullptr);
 }
 
-TEST(ListNodeAddTest, AddingInsideList) {
+TEST(ListNodeAddTest, AddInsideList) {
     auto expected = std::vector<std::pair<int, int>>{{1, -1}, {7, -7}, {2, -2}, {3, -3}};
 
     auto node1 = ListNode<int, int>::Make(1, -1);

@@ -114,7 +114,7 @@ auto RBTREE_TYPE::ValidateTree(int &count) -> bool {
 
 RBTREE_TEMPLATE
 void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
-    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> & node);
+    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node>& node);
     using Child = std::unique_ptr<Node> Node::*;
 
     RotateFn rotate1;  // left if node is left child; right otherwise
@@ -167,7 +167,7 @@ void RBTREE_TYPE::InsertFix(std::unique_ptr<Node> *node) {
 
 RBTREE_TEMPLATE
 void RBTREE_TYPE::DeleteFix(std::unique_ptr<Node> *node) {
-    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node> & node);
+    using RotateFn = void (RBTREE_TYPE::*)(std::unique_ptr<Node>& node);
     using Child = std::unique_ptr<Node> Node::*;
 
     RotateFn rotate1;  // left if node is left child; right otherwise

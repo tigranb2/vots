@@ -59,6 +59,7 @@ auto LN_TYPE::ValidateList(const std::unique_ptr<ListNode> &head,
 
     return node == nullptr;
 }
+
 template class ListNode<int, int>;
 
 }  // namespace vots

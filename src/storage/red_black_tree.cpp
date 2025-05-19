@@ -254,7 +254,7 @@ void RBTREE_TYPE::RotateLeft(std::unique_ptr<Node> &node) {
     new_parent->left_->parent_ = new_parent.get();
 
     // update new_parent's parentage
-    if (!node_parent) {
+    if (node_parent == nullptr) {
         this->root_ = std::move(new_parent);
         this->root_->parent_ = nullptr;
     } else {
@@ -285,7 +285,7 @@ void RBTREE_TYPE::RotateRight(std::unique_ptr<Node> &node) {
     new_parent->right_->parent_ = new_parent.get();
 
     // update new_parent's parentage
-    if (!node_parent) {
+    if (node_parent == nullptr) {
         this->root_ = std::move(new_parent);
         this->root_->parent_ = nullptr;
     } else {

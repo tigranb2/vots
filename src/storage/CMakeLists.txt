@@ -1,6 +1,7 @@
 add_library(
         vots_storage
         OBJECT
+        list_node.cpp
         red_black_tree.cpp
     )
 

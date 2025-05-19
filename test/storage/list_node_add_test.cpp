@@ -32,8 +32,8 @@ TEST(ListNodeAddTest, IllegalAdd) {
     auto node1 = ListNode<int, int>::Make(1, -1);
     ASSERT_DEATH(node1->Add(empty_node), "");
 
-    node1->Add(node1);
-    ASSERT_EQ(node1.get(), nullptr);
+    ASSERT_ANY_THROW(node1->Add(node1));
+    ASSERT_EQ(node1->next_, nullptr);
 }
 
 TEST(ListNodeAddTest, AddInsideList) {

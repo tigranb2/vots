@@ -9,6 +9,10 @@ auto LN_TYPE::Make(KeyType key, DataType data) -> std::unique_ptr<ListNode> {
 
 LN_TEMPLATE
 auto LN_TYPE::Add(std::unique_ptr<ListNode> &new_node) -> std::unique_ptr<ListNode> & {
+    if (new_node.get() == this) {
+        throw std::invalid_argument("cannot add node to self");
+    }
+
     new_node->prev_ = this;
     this->next_ = std::move(new_node);
     return this->next_;

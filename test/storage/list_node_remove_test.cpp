@@ -45,17 +45,17 @@ TEST(ListNodeRemoveTest, RemoveInsideList) {
 
     auto tail = random_del_node->next_->next_->next_->next_.get();
     tail->Remove();
-    std::vector<std::pair<int,int>> after_tail = {{1,10}, {2,20}, {3,30}, {4,40}};
+    std::vector<std::pair<int, int>> after_tail = {{1, 10}, {2, 20}, {3, 30}, {4, 40}};
     ASSERT_TRUE((ListNode<int, int>::ValidateList(random_del_node, after_tail)));
 
     auto node3 = random_del_node->next_->next_.get();
     node3->Remove();
-    std::vector<std::pair<int,int>> after_mid = {{1,10}, {2,20}, {4,40}};
+    std::vector<std::pair<int, int>> after_mid = {{1, 10}, {2, 20}, {4, 40}};
     ASSERT_TRUE((ListNode<int, int>::ValidateList(random_del_node, after_mid)));
 
     auto node2 = random_del_node->next_.get();
     node2->Remove();
-    std::vector<std::pair<int,int>> after_second = {{1,10}, {4,40}};
+    std::vector<std::pair<int, int>> after_second = {{1, 10}, {4, 40}};
     ASSERT_TRUE((ListNode<int, int>::ValidateList(random_del_node, after_second)));
 }
 }  // namespace vots

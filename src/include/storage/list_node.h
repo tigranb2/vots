@@ -44,6 +44,6 @@ LN_TEMPLATE class ListNode {
                              const std::vector<std::pair<KeyType, DataType>> &expected) -> bool;
 
    private:
-    ListNode(KeyType key, DataType data) : key_(key), data_(std::move(data)), next_(nullptr), prev_(nullptr) {};
+    ListNode(KeyType key, DataType data) : key_(key), data_(std::move(data)), next_(nullptr), prev_(nullptr){};
 };
 }  // namespace vots

@@ -1,5 +1,7 @@
 #include "storage/list_node.h"
 
+#include <stdexcept>
+
 namespace vots {
 
 LN_TEMPLATE

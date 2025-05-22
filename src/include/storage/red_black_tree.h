@@ -17,13 +17,26 @@ namespace vots {
  * prices eliminates the need for lookups in the limit trees altogether.
  */
 RBTREE_TEMPLATE class RedBlackTree {
+   private:
+    struct Node;
+
    public:
+    // NodeHandle is used to safely share references to Nodes
+    class NodeHandle {
+        friend class RedBlackTree;
+
+       private:
+        Node *node_ptr_;
+        explicit NodeHandle(Node *ptr) : node_ptr_(ptr) {};
+    };
+
     RedBlackTree();
 
     // Find returns a nullptr if the data with the specified key was not found
     auto Find(KeyType key) -> DataType *;
-    void Insert(KeyType key, DataType data);
+    auto Insert(KeyType key, DataType data) -> NodeHandle;
     void Delete(KeyType key);
+    void Delete(NodeHandle& node);
 
     auto ValidateTree(int &count) -> bool;
 

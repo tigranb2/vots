@@ -44,7 +44,7 @@ RBTREE_TEMPLATE class RedBlackTree {
 
     // Find returns a nullptr if the data with the specified key was not found
     auto Find(KeyType key) -> DataType *;
-    auto Insert(KeyType key, DataType data) -> Node &;
+    auto Insert(KeyType key, DataType data) -> const Node &;
     void Delete(KeyType key);
     void Delete(Node &node);
 

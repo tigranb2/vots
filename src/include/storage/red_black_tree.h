@@ -17,31 +17,11 @@ namespace vots {
  * prices eliminates the need for lookups in the limit trees altogether.
  */
 RBTREE_TEMPLATE class RedBlackTree {
-   private:
-    struct Node;
-
    public:
-    // NodeHandle is used to safely share references to Nodes
-    class NodeHandle {
+    class Node {
         friend class RedBlackTree;
 
        private:
-        Node *node_ptr_;
-        explicit NodeHandle(Node *ptr) : node_ptr_(ptr) {};
-    };
-
-    RedBlackTree();
-
-    // Find returns a nullptr if the data with the specified key was not found
-    auto Find(KeyType key) -> DataType *;
-    auto Insert(KeyType key, DataType data) -> NodeHandle;
-    void Delete(KeyType key);
-    void Delete(NodeHandle& node);
-
-    auto ValidateTree(int &count) -> bool;
-
-   private:
-    struct Node {
         DataType data_;
         Node *parent_;
         std::unique_ptr<Node> left_;
@@ -60,6 +40,17 @@ RBTREE_TEMPLATE class RedBlackTree {
               is_nil_(is_nil) {}
     };
 
+    RedBlackTree();
+
+    // Find returns a nullptr if the data with the specified key was not found
+    auto Find(KeyType key) -> DataType *;
+    auto Insert(KeyType key, DataType data) -> Node &;
+    void Delete(KeyType key);
+    void Delete(Node &node);
+
+    auto ValidateTree(int &count) -> bool;
+
+   private:
     // InsertFix restores violated tree invariants, if any are present, after an insert
     void InsertFix(std::unique_ptr<Node> *node);
     // DeleteFix restores violated tree invariants, if any are present, after a delete

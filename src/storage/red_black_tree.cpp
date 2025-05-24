@@ -27,7 +27,7 @@ auto RBTREE_TYPE::Find(KeyType key) -> DataType * {
 }
 
 RBTREE_TEMPLATE
-auto RBTREE_TYPE::Insert(KeyType key, DataType data) -> const Node & {
+auto RBTREE_TYPE::Insert(KeyType key, DataType data) -> Node & {
     if (this->root_->is_nil_) {
         this->root_ = this->NewNode(key, data, nullptr);
         this->root_->is_red_ = false;

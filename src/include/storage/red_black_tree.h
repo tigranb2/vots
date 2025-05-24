@@ -19,7 +19,7 @@ namespace vots {
 RBTREE_TEMPLATE class RedBlackTree {
    public:
     class Node {
-        friend class RedBlackTree;
+        friend class RBTREE_TYPE;
 
        private:
         DataType data_;
@@ -44,7 +44,7 @@ RBTREE_TEMPLATE class RedBlackTree {
 
     // Find returns a nullptr if the data with the specified key was not found
     auto Find(KeyType key) -> DataType *;
-    auto Insert(KeyType key, DataType data) -> const Node &;
+    auto Insert(KeyType key, DataType data) -> Node &;
     void Delete(KeyType key);
     void Delete(Node &node);
 
@@ -61,14 +61,14 @@ RBTREE_TEMPLATE class RedBlackTree {
 
     // NewNode returns a red node with the specified key, data, and parent
     auto NewNode(KeyType key, DataType data, Node *parent) -> std::unique_ptr<Node> {
-        auto n = std::make_unique<Node>(data, parent, key, true, false);
+        auto n = std::unique_ptr<Node>(new Node(data, parent, key, true, false));
         n->left_ = std::move(NewDummyNil(n.get()));
         n->right_ = std::move(NewDummyNil(n.get()));
         return n;
     }
     // NewDummyNil returns a node representing a parent's NIL child (by spec., these are black)
     auto NewDummyNil(Node *parent) -> std::unique_ptr<Node> {
-        return std::make_unique<Node>(DataType{}, parent, KeyType{}, false, true);
+        return std::unique_ptr<Node>(new Node(DataType{}, parent, KeyType{}, false, true));
     }
 
     // GetNodeOwner returns the unique_ptr owning the provided, not_null Node pointer

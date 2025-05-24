@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 #include <random>
 #include <vector>
 
@@ -81,5 +82,42 @@ TEST(RedBlackTreeMixTest, RandomMixSmall) { RandomMixTesting(5, 15); }
 TEST(RedBlackTreeMixTest, RandomMixLarge) { RandomMixTesting(70000, 120000); }
 
 TEST(RedBlackTreeMixTest, DISABLED_RandomMixVeryLarge) { RandomMixTesting(700000, 1200000); }
+
+TEST(RedBlackTreeMixTest, DeleteInsertResult) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    // First batch of inserts
+    std::uniform_int_distribution<int> count_dist(5, 10);
+    int num_nodes = count_dist(gen);
+
+    std::vector<int> keys(num_nodes);
+    for (int i = 0; i < num_nodes; ++i) {
+        keys[i] = i;
+    }
+    std::shuffle(keys.begin(), keys.end(), gen);
+
+    auto tree = RedBlackTree<int, int>();
+    std::vector<std::reference_wrapper<RedBlackTree<int, int>::Node>> inserted;
+    inserted.reserve(num_nodes);
+    for (int k : keys) {
+        inserted.push_back(std::ref(tree.Insert(k, k)));
+    }
+
+    int count = 0;
+    ASSERT_TRUE(tree.ValidateTree(count));
+    ASSERT_EQ(count, num_nodes);
+
+    for (int i = 0; i < num_nodes; ++i) {
+        RedBlackTree<int, int>::Node& node = inserted[i];
+
+        tree.Delete(node);
+
+        count = 0;
+        ASSERT_TRUE(tree.ValidateTree(count));
+        ASSERT_EQ(count, num_nodes - i - 1);
+        ASSERT_EQ(tree.Find(keys[i]), nullptr);
+    }
+}
 
 }  // namespace vots

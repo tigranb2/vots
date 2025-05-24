@@ -72,7 +72,7 @@ void RBTREE_TYPE::Delete(KeyType key) {
             cur = cur->right_.get();
         }
     }
-    
+
     this->Delete(*cur);
 }
 

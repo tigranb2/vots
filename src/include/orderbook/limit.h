@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "orderbook/order.h"
+#include "order.h"
 #include "storage/list_node.h"
 
 namespace vots {
@@ -13,8 +13,12 @@ class Limit {
     int size_;
     int total_volume_;
 
-    auto GetHeadOrder() -> std::unique_ptr<ListNode<int, Order>> &;
-    auto GetTailOrder() -> std::unique_ptr<ListNode<int, Order>> &;
+    auto GetHeadOrder() -> std::unique_ptr<ListNode<int, Order>> & {
+        return *head_order_;
+    }
+    auto GetTailOrder() -> std::unique_ptr<ListNode<int, Order>> & {
+        return *tail_order_;
+    }
 
    private:
     std::unique_ptr<ListNode<int, Order>> *head_order_;

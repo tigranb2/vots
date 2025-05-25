@@ -91,6 +91,9 @@ function(disable_target_warnings NAME)
         target_compile_options(${NAME} PRIVATE "-w")
 endfunction()
 
+# Third party
+find_package(GTest REQUIRED)
+
 # Other CMake modules
 add_subdirectory(src)
 add_subdirectory(test)
@@ -103,6 +106,8 @@ add_custom_target(lint
         ${CMAKE_SOURCE_DIR}/src 
         ${CMAKE_SOURCE_DIR}/test
 )
+add_dependencies(lint GTest::gtest vots) 
+
 add_custom_target(lint-fix
         ${CMAKE_SOURCE_DIR}/run_clang_tidy.py 
         -clang-tidy-binary ${CLANG_TIDY_BIN} 
@@ -133,13 +138,3 @@ add_custom_target(format-fix ${CMAKE_SOURCE_DIR}/run_clang_format.py
         --fix
         --quiet
 )
-
-# Third party
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG        v1.15.2
-)
-FetchContent_MakeAvailable(googletest)
-add_dependencies(lint gtest vots) 

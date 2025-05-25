@@ -27,11 +27,11 @@ auto RBTREE_TYPE::Find(KeyType key) -> DataType * {
 }
 
 RBTREE_TEMPLATE
-void RBTREE_TYPE::Insert(KeyType key, DataType data) {
+auto RBTREE_TYPE::Insert(KeyType key, DataType data) -> Node & {
     if (this->root_->is_nil_) {
         this->root_ = this->NewNode(key, data, nullptr);
         this->root_->is_red_ = false;
-        return;
+        return *this->root_.get();
     }
 
     Node *prev = nullptr;
@@ -47,6 +47,7 @@ void RBTREE_TYPE::Insert(KeyType key, DataType data) {
     }
 
     std::unique_ptr<Node> new_node = this->NewNode(key, data, prev);
+    Node *new_node_ptr = new_node.get();
     if (key < prev->key_) {
         prev->left_ = std::move(new_node);
         this->InsertFix(&prev->left_);
@@ -54,6 +55,7 @@ void RBTREE_TYPE::Insert(KeyType key, DataType data) {
         prev->right_ = std::move(new_node);
         this->InsertFix(&prev->right_);
     }
+    return *new_node_ptr;
 }
 
 RBTREE_TEMPLATE
@@ -71,16 +73,22 @@ void RBTREE_TYPE::Delete(KeyType key) {
         }
     }
 
-    std::unique_ptr<Node> &replacement = this->FindDeleteReplacement(cur);
+    this->Delete(*cur);
+}
+
+RBTREE_TEMPLATE
+void RBTREE_TYPE::Delete(Node &node) {
+    std::unique_ptr<Node> &replacement = this->FindDeleteReplacement(&node);
+
     Node *fix_candidate = replacement.get();
-    bool should_fix = !cur->is_red_;  // run DeleteFix if replaced node is black
-    if (!cur->left_->is_nil_ && !cur->right_->is_nil_) {
+    bool should_fix = !node.is_red_;  // run DeleteFix if replaced node is black
+    if (!node.left_->is_nil_ && !node.right_->is_nil_) {
         fix_candidate = replacement->right_.get();
         should_fix = !replacement->is_red_;  // in this case, run DeleteFix if replacing node was black
-        replacement->is_red_ = cur->is_red_;
+        replacement->is_red_ = node.is_red_;
     }
 
-    this->ReplaceDeleted(cur, &replacement);
+    this->ReplaceDeleted(&node, &replacement);
     if (should_fix) {
         std::unique_ptr<Node> &fc_unique_ptr = this->GetNodeOwner(fix_candidate);
         this->DeleteFix(&fc_unique_ptr);

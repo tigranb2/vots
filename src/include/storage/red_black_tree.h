@@ -44,6 +44,23 @@ RBTREE_TEMPLATE class RedBlackTree {
 
     // Find returns a nullptr if the data with the specified key was not found
     auto Find(KeyType key) -> DataType *;
+
+    // Return the minimum value in the tree. If the tree is empty, returns nullptr
+    auto GetMin() -> DataType * {
+        if (min_node_ == nullptr) {
+            return nullptr;
+        }
+        return &min_node_->data_;
+    }
+
+    // Return the maximum value in the tree. If the tree is empty, returns nullptr
+    auto GetMax() -> DataType * {
+        if (max_node_ == nullptr) {
+            return nullptr;
+        }
+        return &max_node_->data_;
+    }
+
     auto Insert(KeyType key, DataType data) -> Node &;
     void Delete(KeyType key);
     void Delete(Node &node);
@@ -51,6 +68,10 @@ RBTREE_TEMPLATE class RedBlackTree {
     auto ValidateTree(int &count) -> bool;
 
    private:
+    std::unique_ptr<Node> root_;
+    Node *max_node_;
+    Node *min_node_;
+
     // InsertFix restores violated tree invariants, if any are present, after an insert
     void InsertFix(std::unique_ptr<Node> *node);
     // DeleteFix restores violated tree invariants, if any are present, after a delete
@@ -84,10 +105,20 @@ RBTREE_TEMPLATE class RedBlackTree {
         return parent->right_;
     }
 
+    // Finds new minimum node discounting tree's current minimum
+    auto FindNewMin() -> Node * {
+        Node *parent = this->min_node_->parent_;
+        return parent != nullptr ? parent : this->min_node_->right_.get();
+    }
+
+    // Finds new maximum node discounting tree's current maximum
+    auto FindNewMax() -> Node * {
+        Node *parent = this->max_node_->parent_;
+        return parent != nullptr ? parent : this->max_node_->left_.get();
+    }
+
     auto FindDeleteReplacement(Node *to_delete) -> std::unique_ptr<Node> &;
     void ReplaceDeleted(Node *to_delete, std::unique_ptr<Node> *replacement);
-
-    std::unique_ptr<Node> root_;
 };
 
 }  // namespace vots

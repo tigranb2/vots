@@ -18,8 +18,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Set up vcpkg
+      uses: lukka/run-vcpkg@v11
+
     - name: Build Project
-      run: cmake ..
+      run: cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
     - name: Build tests
       run: make build-tests

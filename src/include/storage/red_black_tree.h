@@ -112,13 +112,13 @@ RBTREE_TEMPLATE class RedBlackTree {
             return right_child;
         }
 
-        return  this->min_node_->parent_;
+        return this->min_node_->parent_;
     }
 
     // Finds new maximum node discounting tree's current maximum
     auto FindNewMax() -> Node * {
         Node *left_child = this->max_node_->left_.get();
-        if (!left_child->is_nil_ ) {
+        if (!left_child->is_nil_) {
             return left_child;
         }
 

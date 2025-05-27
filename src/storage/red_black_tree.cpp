@@ -31,6 +31,11 @@ auto RBTREE_TYPE::Insert(KeyType key, DataType data) -> Node & {
     if (this->root_->is_nil_) {
         this->root_ = this->NewNode(key, data, nullptr);
         this->root_->is_red_ = false;
+        Node *new_node_ptr = this->root_.get();
+
+        this->min_node_ = new_node_ptr;
+        this->max_node_ = new_node_ptr;
+
         return *this->root_.get();
     }
 
@@ -55,6 +60,12 @@ auto RBTREE_TYPE::Insert(KeyType key, DataType data) -> Node & {
         prev->right_ = std::move(new_node);
         this->InsertFix(&prev->right_);
     }
+
+    if (new_node_ptr->key_ > this->max_node_->key_) {
+        this->max_node_ = new_node_ptr;
+    } else if (new_node_ptr->key_ < this->min_node_->key_) {
+        this->min_node_ = new_node_ptr;
+    }
     return *new_node_ptr;
 }
 
@@ -78,6 +89,13 @@ void RBTREE_TYPE::Delete(KeyType key) {
 
 RBTREE_TEMPLATE
 void RBTREE_TYPE::Delete(Node &node) {
+    if (&node == this->min_node_) {
+        this->min_node_ = this->FindNewMin();
+    }
+    if (&node == this->max_node_) {
+        this->max_node_ = this->FindNewMax();
+    }
+
     std::unique_ptr<Node> &replacement = this->FindDeleteReplacement(&node);
 
     Node *fix_candidate = replacement.get();

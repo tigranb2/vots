@@ -325,7 +325,6 @@ void RBTREE_TYPE::RotateRight(std::unique_ptr<Node> &node) {
     }
 }
 
-
 RBTREE_TEMPLATE
 auto RBTREE_TYPE::FindDeleteReplacement(Node *to_delete) -> std::unique_ptr<Node> & {
     if (to_delete->left_->is_nil_) {

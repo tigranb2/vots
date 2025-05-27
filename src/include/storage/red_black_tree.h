@@ -46,19 +46,19 @@ RBTREE_TEMPLATE class RedBlackTree {
     auto Find(KeyType key) -> DataType *;
 
     // Return the minimum value in the tree. If the tree is empty, returns nullptr
-    auto GetMin() -> DataType * {
+    auto GetMin() -> Node * {
         if (min_node_ == nullptr) {
             return nullptr;
         }
-        return &min_node_->data_;
+        return min_node_;
     }
 
     // Return the maximum value in the tree. If the tree is empty, returns nullptr
-    auto GetMax() -> DataType * {
+    auto GetMax() -> Node * {
         if (max_node_ == nullptr) {
             return nullptr;
         }
-        return &max_node_->data_;
+        return max_node_;
     }
 
     auto Insert(KeyType key, DataType data) -> Node &;
@@ -69,8 +69,8 @@ RBTREE_TEMPLATE class RedBlackTree {
 
    private:
     std::unique_ptr<Node> root_;
-    Node *max_node_;
-    Node *min_node_;
+    Node *max_node_ = nullptr;
+    Node *min_node_ = nullptr;
 
     // InsertFix restores violated tree invariants, if any are present, after an insert
     void InsertFix(std::unique_ptr<Node> *node);
@@ -107,14 +107,22 @@ RBTREE_TEMPLATE class RedBlackTree {
 
     // Finds new minimum node discounting tree's current minimum
     auto FindNewMin() -> Node * {
-        Node *parent = this->min_node_->parent_;
-        return parent != nullptr ? parent : this->min_node_->right_.get();
+        Node *right_child = this->min_node_->right_.get();
+        if (!right_child->is_nil_) {
+            return right_child;
+        }
+
+        return  this->min_node_->parent_;
     }
 
     // Finds new maximum node discounting tree's current maximum
     auto FindNewMax() -> Node * {
-        Node *parent = this->max_node_->parent_;
-        return parent != nullptr ? parent : this->max_node_->left_.get();
+        Node *left_child = this->max_node_->left_.get();
+        if (!left_child->is_nil_ ) {
+            return left_child;
+        }
+
+        return this->max_node_->parent_;
     }
 
     auto FindDeleteReplacement(Node *to_delete) -> std::unique_ptr<Node> &;

@@ -117,7 +117,7 @@ void RandomDeletingInsertResultTesting(int lower, int upper) {
             count = 0;
             ASSERT_TRUE(tree.ValidateTree(count));
             ASSERT_EQ(count, num_nodes - i - 1);
-            ASSERT_EQ(tree.Find(keys[i]), nullptr);
+            ASSERT_EQ(tree.At(keys[i]), nullptr);
         }
     }
 }

@@ -11,7 +11,7 @@ RBTREE_TEMPLATE
 RBTREE_TYPE::RedBlackTree() : root_(std::move(NewDummyNil(nullptr))){};
 
 RBTREE_TEMPLATE
-auto RBTREE_TYPE::Find(KeyType key) -> DataType * {
+auto RBTREE_TYPE::At(KeyType key) -> DataType * {
     Node *cur = this->root_.get();
     while (!cur->is_nil_) {
         if (cur->key_ == key) {

@@ -15,7 +15,7 @@ TEST(RedBlackTreeInsertTest, InsertOnEmptyTree) {
     int count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
     ASSERT_EQ(count, 1);
-    ASSERT_EQ(*tree.Find(1), "a");
+    ASSERT_EQ(*tree.At(1), "a");
 }
 
 TEST(RedBlackTreeInsertTest, IncreasingSequentialInsert) {
@@ -30,7 +30,7 @@ TEST(RedBlackTreeInsertTest, IncreasingSequentialInsert) {
         ASSERT_EQ(count, i + 1);
     }
     for (int i = 0; i < 10; ++i) {
-        ASSERT_EQ(*tree.Find(i), vals[i]);
+        ASSERT_EQ(*tree.At(i), vals[i]);
     }
 }
 
@@ -46,7 +46,7 @@ TEST(RedBlackTreeInsertTest, DecreasingSequentialInsert) {
         ASSERT_EQ(count, 10 - i);
     }
     for (int i = 9; i >= 0; --i) {
-        ASSERT_EQ(*tree.Find(i), vals[i]);
+        ASSERT_EQ(*tree.At(i), vals[i]);
     }
 }
 
@@ -59,7 +59,7 @@ TEST(RedBlackTreeInsertTest, IncreasingSequentialInsertLarge) {
     ASSERT_TRUE(tree.ValidateTree(count));
     ASSERT_EQ(count, 100000);
     for (int i = 0; i < 100000; ++i) {
-        ASSERT_EQ(*tree.Find(i), -i);
+        ASSERT_EQ(*tree.At(i), -i);
     }
 }
 
@@ -73,7 +73,7 @@ TEST(RedBlackTreeInsertTest, DecreasingSequentialInsertLarge) {
     ASSERT_TRUE(tree.ValidateTree(count));
     ASSERT_EQ(count, 100000);
     for (int i = 99999; i >= 0; --i) {
-        ASSERT_EQ(*tree.Find(i), -i);
+        ASSERT_EQ(*tree.At(i), -i);
     }
 }
 
@@ -88,10 +88,10 @@ TEST(RedBlackTreeInsertTest, RedUncle) {
     ASSERT_TRUE(tree.ValidateTree(count));
     ASSERT_EQ(count, 4);
 
-    ASSERT_EQ(*tree.Find(2), "a");
-    ASSERT_EQ(*tree.Find(3), "b");
-    ASSERT_EQ(*tree.Find(1), "c");
-    ASSERT_EQ(*tree.Find(0), "d");
+    ASSERT_EQ(*tree.At(2), "a");
+    ASSERT_EQ(*tree.At(3), "b");
+    ASSERT_EQ(*tree.At(1), "c");
+    ASSERT_EQ(*tree.At(0), "d");
 }
 
 TEST(RedBlackTreeInsertTest, Case4) {
@@ -106,11 +106,11 @@ TEST(RedBlackTreeInsertTest, Case4) {
     ASSERT_TRUE(tree_left.ValidateTree(count_left));
     ASSERT_EQ(count_left, 5);
 
-    ASSERT_EQ(*tree_left.Find(2), "a");
-    ASSERT_EQ(*tree_left.Find(3), "b");
-    ASSERT_EQ(*tree_left.Find(1), "c");
-    ASSERT_EQ(*tree_left.Find(0), "d");
-    ASSERT_EQ(*tree_left.Find(-1), "e");
+    ASSERT_EQ(*tree_left.At(2), "a");
+    ASSERT_EQ(*tree_left.At(3), "b");
+    ASSERT_EQ(*tree_left.At(1), "c");
+    ASSERT_EQ(*tree_left.At(0), "d");
+    ASSERT_EQ(*tree_left.At(-1), "e");
 
     auto tree_right = RedBlackTree<int, std::string>();
     tree_right.Insert(2, "a");
@@ -123,11 +123,11 @@ TEST(RedBlackTreeInsertTest, Case4) {
     ASSERT_TRUE(tree_right.ValidateTree(count_right));
     ASSERT_EQ(count_right, 5);
 
-    ASSERT_EQ(*tree_right.Find(2), "a");
-    ASSERT_EQ(*tree_right.Find(3), "b");
-    ASSERT_EQ(*tree_right.Find(1), "c");
-    ASSERT_EQ(*tree_right.Find(4), "d");
-    ASSERT_EQ(*tree_right.Find(5), "e");
+    ASSERT_EQ(*tree_right.At(2), "a");
+    ASSERT_EQ(*tree_right.At(3), "b");
+    ASSERT_EQ(*tree_right.At(1), "c");
+    ASSERT_EQ(*tree_right.At(4), "d");
+    ASSERT_EQ(*tree_right.At(5), "e");
 }
 
 TEST(RedBlackTreeInsertTest, Case3) {
@@ -142,11 +142,11 @@ TEST(RedBlackTreeInsertTest, Case3) {
     ASSERT_TRUE(tree_left.ValidateTree(count_left));
     ASSERT_EQ(count_left, 5);
 
-    ASSERT_EQ(*tree_left.Find(3), "a");
-    ASSERT_EQ(*tree_left.Find(4), "b");
-    ASSERT_EQ(*tree_left.Find(2), "c");
-    ASSERT_EQ(*tree_left.Find(0), "d");
-    ASSERT_EQ(*tree_left.Find(1), "e");
+    ASSERT_EQ(*tree_left.At(3), "a");
+    ASSERT_EQ(*tree_left.At(4), "b");
+    ASSERT_EQ(*tree_left.At(2), "c");
+    ASSERT_EQ(*tree_left.At(0), "d");
+    ASSERT_EQ(*tree_left.At(1), "e");
 
     auto tree_right = RedBlackTree<int, std::string>();
     tree_right.Insert(2, "a");
@@ -159,11 +159,11 @@ TEST(RedBlackTreeInsertTest, Case3) {
     ASSERT_TRUE(tree_right.ValidateTree(count_right));
     ASSERT_EQ(count_right, 5);
 
-    ASSERT_EQ(*tree_right.Find(2), "a");
-    ASSERT_EQ(*tree_right.Find(3), "b");
-    ASSERT_EQ(*tree_right.Find(1), "c");
-    ASSERT_EQ(*tree_right.Find(5), "d");
-    ASSERT_EQ(*tree_right.Find(4), "e");
+    ASSERT_EQ(*tree_right.At(2), "a");
+    ASSERT_EQ(*tree_right.At(3), "b");
+    ASSERT_EQ(*tree_right.At(1), "c");
+    ASSERT_EQ(*tree_right.At(5), "d");
+    ASSERT_EQ(*tree_right.At(4), "e");
 }
 
 TEST(RedBlackTreeInsertTest, RandomInsert) {
@@ -194,17 +194,17 @@ TEST(RedBlackTreeInsertTest, RandomInsert) {
     tree.Insert(2, -2);
     ASSERT_TRUE(tree.ValidateTree(c));
 
-    ASSERT_EQ(*tree.Find(1), -1);
-    ASSERT_EQ(*tree.Find(7), -7);
-    ASSERT_EQ(*tree.Find(3), -3);
-    ASSERT_EQ(*tree.Find(12), -12);
-    ASSERT_EQ(*tree.Find(4), -4);
-    ASSERT_EQ(*tree.Find(0), 0);
-    ASSERT_EQ(*tree.Find(90), -90);
-    ASSERT_EQ(*tree.Find(55), -55);
-    ASSERT_EQ(*tree.Find(6), -6);
-    ASSERT_EQ(*tree.Find(9), -9);
-    ASSERT_EQ(*tree.Find(2), -2);
+    ASSERT_EQ(*tree.At(1), -1);
+    ASSERT_EQ(*tree.At(7), -7);
+    ASSERT_EQ(*tree.At(3), -3);
+    ASSERT_EQ(*tree.At(12), -12);
+    ASSERT_EQ(*tree.At(4), -4);
+    ASSERT_EQ(*tree.At(0), 0);
+    ASSERT_EQ(*tree.At(90), -90);
+    ASSERT_EQ(*tree.At(55), -55);
+    ASSERT_EQ(*tree.At(6), -6);
+    ASSERT_EQ(*tree.At(9), -9);
+    ASSERT_EQ(*tree.At(2), -2);
 }
 
 TEST(RedBlackTreeInsertTest, RandomInsertLarge) {
@@ -227,7 +227,7 @@ TEST(RedBlackTreeInsertTest, RandomInsertLarge) {
         ASSERT_EQ(count, 100000);
 
         for (int i = 0; i < size; ++i) {
-            ASSERT_EQ(*tree.Find(vec[i]), -vec[i]);
+            ASSERT_EQ(*tree.At(vec[i]), -vec[i]);
         }
     }
 }

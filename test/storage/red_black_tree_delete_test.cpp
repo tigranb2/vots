@@ -76,7 +76,7 @@ TEST(RedBlackTreeDeleteTest, IncreasingSequentialDelete) {
     }
     for (int i = 0; i < 10; ++i) {
         tree.Delete(i);
-        ASSERT_EQ(tree.Find(i), nullptr) << i;
+        ASSERT_EQ(tree.At(i), nullptr) << i;
 
         int count = 0;
         ASSERT_TRUE(tree.ValidateTree(count));
@@ -94,7 +94,7 @@ TEST(RedBlackTreeDeleteTest, DecreasingSequentialDelete) {
     }
     for (int i = 9; i >= 0; --i) {
         tree.Delete(i);
-        ASSERT_EQ(tree.Find(i), nullptr);
+        ASSERT_EQ(tree.At(i), nullptr);
 
         int count = 0;
         ASSERT_TRUE(tree.ValidateTree(count));
@@ -109,7 +109,7 @@ TEST(RedBlackTreeDeleteTest, IncreasingSequentialDeleteLarge) {
     }
     for (int i = 0; i < 100000; ++i) {
         tree.Delete(i);
-        ASSERT_EQ(tree.Find(i), nullptr);
+        ASSERT_EQ(tree.At(i), nullptr);
     }
     int count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
@@ -124,7 +124,7 @@ TEST(RedBlackTreeDeleteTest, DecreasingSequentialDeleteLarge) {
     }
     for (int i = 99999; i >= 0; --i) {
         tree.Delete(i);
-        ASSERT_EQ(tree.Find(i), nullptr);
+        ASSERT_EQ(tree.At(i), nullptr);
     }
     int count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
@@ -144,10 +144,10 @@ TEST(RedBlackTreeDeleteTest, SiblingWithAdjacentRedChild) {
     ASSERT_TRUE(tree_left.ValidateTree(count_left));
     ASSERT_EQ(count_left, 3);
 
-    ASSERT_EQ(tree_left.Find(0), nullptr);
-    ASSERT_EQ(*tree_left.Find(1), "b");
-    ASSERT_EQ(*tree_left.Find(2), "d");
-    ASSERT_EQ(*tree_left.Find(3), "c");
+    ASSERT_EQ(tree_left.At(0), nullptr);
+    ASSERT_EQ(*tree_left.At(1), "b");
+    ASSERT_EQ(*tree_left.At(2), "d");
+    ASSERT_EQ(*tree_left.At(3), "c");
 
     auto tree_right = RedBlackTree<int, std::string>();
     tree_right.Insert(3, "c");
@@ -161,10 +161,10 @@ TEST(RedBlackTreeDeleteTest, SiblingWithAdjacentRedChild) {
     ASSERT_TRUE(tree_right.ValidateTree(count_right));
     ASSERT_EQ(count_left, 3);
 
-    ASSERT_EQ(*tree_right.Find(0), "a");
-    ASSERT_EQ(*tree_right.Find(1), "b");
-    ASSERT_EQ(*tree_right.Find(2), "d");
-    ASSERT_EQ(tree_right.Find(3), nullptr);
+    ASSERT_EQ(*tree_right.At(0), "a");
+    ASSERT_EQ(*tree_right.At(1), "b");
+    ASSERT_EQ(*tree_right.At(2), "d");
+    ASSERT_EQ(tree_right.At(3), nullptr);
 }
 
 TEST(RedBlackTreeDeleteTest, RandomDelete) {
@@ -185,31 +185,31 @@ TEST(RedBlackTreeDeleteTest, RandomDelete) {
     tree.Delete(2);
     int count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
-    ASSERT_EQ(tree.Find(2), nullptr);
+    ASSERT_EQ(tree.At(2), nullptr);
     ASSERT_EQ(count, 11);
 
     tree.Delete(90);
     count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
-    ASSERT_EQ(tree.Find(90), nullptr);
+    ASSERT_EQ(tree.At(90), nullptr);
     ASSERT_EQ(count, 10);
 
     tree.Delete(6);
     count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
-    ASSERT_EQ(tree.Find(6), nullptr);
+    ASSERT_EQ(tree.At(6), nullptr);
     ASSERT_EQ(count, 9);
 
     tree.Delete(-12);
     count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
-    ASSERT_EQ(tree.Find(-12), nullptr);
+    ASSERT_EQ(tree.At(-12), nullptr);
     ASSERT_EQ(count, 8);
 
     tree.Delete(3);
     count = 0;
     ASSERT_TRUE(tree.ValidateTree(count));
-    ASSERT_EQ(tree.Find(3), nullptr);
+    ASSERT_EQ(tree.At(3), nullptr);
     ASSERT_EQ(count, 7);
 }
 
@@ -231,7 +231,7 @@ TEST(RedBlackTreeDeleteTest, RandomDeleteLarge) {
         std::shuffle(vec.begin(), vec.end(), g);
         for (int i = 0; i < size; ++i) {
             tree.Delete(vec[i]);
-            ASSERT_EQ(tree.Find(vec[i]), nullptr);
+            ASSERT_EQ(tree.At(vec[i]), nullptr);
         }
 
         int count = 0;

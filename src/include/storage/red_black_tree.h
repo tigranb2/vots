@@ -42,8 +42,8 @@ RBTREE_TEMPLATE class RedBlackTree {
 
     RedBlackTree();
 
-    // Find returns a nullptr if the data with the specified key was not found
-    auto Find(KeyType key) -> DataType *;
+    // At returns a nullptr if the data with the specified key was not found
+    auto At(KeyType key) -> DataType *;
 
     // Return the minimum value in the tree. If the tree is empty, returns nullptr
     auto GetMin() -> Node * {

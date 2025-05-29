@@ -2,6 +2,7 @@
   "name": "vots",
   "version": "0",
   "dependencies": [
-    "gtest"
+    "gtest",
+    "boost-unordered"
   ]
 }

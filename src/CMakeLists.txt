@@ -7,7 +7,7 @@ set(VOTS_LIBS
         )
 
 set(VOTS_THIRDPARTY_LIBS
-        # lib
+        Boost::boost
         )
 
 target_link_libraries(

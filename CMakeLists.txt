@@ -80,6 +80,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Third party
+find_package(GTest REQUIRED)
+find_package(Boost REQUIRED)
+
 # Includes.
 set(VOTS_SRC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/include)
 set(VOTS_TEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/test/include)
@@ -90,9 +94,6 @@ include_directories(BEFORE src) # This is needed for gtest.
 function(disable_target_warnings NAME)
         target_compile_options(${NAME} PRIVATE "-w")
 endfunction()
-
-# Third party
-find_package(GTest REQUIRED)
 
 # Other CMake modules
 add_subdirectory(src)

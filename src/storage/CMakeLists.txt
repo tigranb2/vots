@@ -1,12 +1,13 @@
 add_library(
         vots_storage
         OBJECT
-        list_node.cpp
+        linked_list.cpp
         red_black_tree.cpp
     )
 
 target_link_libraries(
         vots_storage
+        Boost::boost
         # lib
     )
 

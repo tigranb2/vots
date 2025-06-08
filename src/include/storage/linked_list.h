@@ -17,24 +17,28 @@ namespace vots {
  */
 LL_TEMPLATE class LinkedList {
    public:
-    LinkedList();
-
     // Add adds the new node to the end of the tail node and reassigns the tail node
     void Add(KeyType key, DataType data);
 
-    // Remove removes the LinkedList from the list, consequently deleting it. 
+    // Remove removes the LinkedList from the list, consequently deleting it.
     void Remove(KeyType key);
 
+    auto GetHead() -> std::optional<std::pair<KeyType, DataType>> {
+        if (this->head_.get() == nullptr) {
+            return std::nullopt;
+        }
+        return std::make_pair(this->head_->key_, this->head_->data_);
+    }
+
+    auto GetTail() -> std::optional<std::pair<KeyType, DataType>> {
+        if (this->tail_ == nullptr) {
+            return std::nullopt;
+        }
+        return std::make_pair(this->tail_->key_, this->tail_->data_);
+    }
+
     // ValidateList checks whether the list elements are in the order specified by the expected vector
-    static auto ValidateList(const LinkedList& list, const std::vector<std::pair<KeyType, DataType>> &expected) -> bool;
-
-    auto GetHead() -> std::pair<KeyType, DataType> {
-        return {this->head_->key_, this->head_->data_};
-    }
-
-    auto GetTail() -> std::pair<KeyType, DataType> {
-        return {this->tail_->key_, this->tail_->data_};
-    }
+    static auto ValidateList(const LinkedList &list, const std::vector<std::pair<KeyType, DataType>> &expected) -> bool;
 
    private:
     struct Node {
@@ -48,6 +52,6 @@ LL_TEMPLATE class LinkedList {
 
     std::unique_ptr<Node> head_;
     Node *tail_;
-    boost::unordered_flat_map<KeyType, Node &> node_map_;
+    boost::unordered_flat_map<KeyType, Node *> node_map_;
 };
 }  // namespace vots

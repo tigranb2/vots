@@ -6,8 +6,8 @@ namespace vots {
 TEST(LinkedListRemoveTest, SimpleRemove) {
     auto ll = LinkedList<int, int>();
     ll.Add(1, -1);
-    ASSERT_EQ(ll.GetHead().value(), std::pair(1, -1));
-    ASSERT_EQ(ll.GetTail().value(), std::pair(1, -1));
+    ASSERT_EQ(ll.GetHead().value(), std::pair(1, -1));  // NOLINT
+    ASSERT_EQ(ll.GetTail().value(), std::pair(1, -1));  // NOLINT
 
     ll.Remove(1);
     ASSERT_FALSE(ll.GetHead().has_value());

@@ -17,8 +17,8 @@ TEST(LinkedListAddTest, SimpleAdd) {
     ASSERT_TRUE((LinkedList<int, int>::ValidateList(ll, expected)));
 
     ASSERT_TRUE(ll.GetHead());
-    ASSERT_TRUE(ll.GetTail());
     ASSERT_EQ(ll.GetHead().value(), std::pair(2, -2));
+    ASSERT_TRUE(ll.GetTail());
     ASSERT_EQ(ll.GetTail().value(), std::pair(2, -2));
 
     ll.Add(3, -3);
@@ -26,8 +26,8 @@ TEST(LinkedListAddTest, SimpleAdd) {
     ASSERT_TRUE((LinkedList<int, int>::ValidateList(ll, expected)));
 
     ASSERT_TRUE(ll.GetHead());
-    ASSERT_TRUE(ll.GetTail());
     ASSERT_EQ(ll.GetHead().value(), std::pair(2, -2));
+    ASSERT_TRUE(ll.GetTail());
     ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));
 
     ll.Add(-12, 12);
@@ -35,8 +35,8 @@ TEST(LinkedListAddTest, SimpleAdd) {
     ASSERT_TRUE((LinkedList<int, int>::ValidateList(ll, expected)));
 
     ASSERT_TRUE(ll.GetHead());
-    ASSERT_TRUE(ll.GetTail());
     ASSERT_EQ(ll.GetHead().value(), std::pair(2, -2));
+    ASSERT_TRUE(ll.GetTail());
     ASSERT_EQ(ll.GetTail().value(), std::pair(-12, 12));
 }
 

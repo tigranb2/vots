@@ -14,4 +14,3 @@ target_link_libraries(
 set(ALL_OBJECT_FILES
         ${ALL_OBJECT_FILES} $<TARGET_OBJECTS:vots_storage>
         PARENT_SCOPE)
-

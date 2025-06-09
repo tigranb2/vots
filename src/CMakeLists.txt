@@ -1,9 +1,11 @@
 add_subdirectory(storage)
+add_subdirectory(orderbook)
 
 add_library(vots STATIC ${ALL_OBJECT_FILES})
 
 set(VOTS_LIBS
         vots_storage
+        vots_orderbook
         )
 
 set(VOTS_THIRDPARTY_LIBS

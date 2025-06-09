@@ -32,6 +32,8 @@ TEST(LinkedListRemoveTest, RemoveInsideList) {
     ll.Add(2, -2);
     ll.Add(5, -5);
     ll.Add(3, -3);
+    ASSERT_TRUE(ll.GetHead());
+    ASSERT_TRUE(ll.GetTail());
     ASSERT_EQ(ll.GetHead().value(), std::pair(1, -1));
     ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));
 

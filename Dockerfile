@@ -2,18 +2,26 @@ FROM ubuntu:22.04
 
 RUN apt-get update && \
     apt-get install -y \
-        git \
+        build-essential \
         clang \
         clang-tidy \
         clang-format \
         cmake \
-        build-essential \
+        curl \
+        git \
+        pkg-config \
+        zip \
     && rm -rf /var/lib/apt/lists/*
 
+RUN git clone https://github.com/microsoft/vcpkg.git /vcpkg
+RUN cd /vcpkg && \
+    ./bootstrap-vcpkg.sh
+
 WORKDIR /vots/build
-COPY . /vots
+COPY ./ /vots
 RUN rm -r *
 
-RUN cmake ..
+RUN cmake .. \
+    -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 CMD ["make test"]

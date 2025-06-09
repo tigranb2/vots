@@ -47,7 +47,7 @@ LL_TEMPLATE class LinkedList {
         std::unique_ptr<Node> next_;
         Node *prev_;
 
-        Node(KeyType key, DataType data) : key_(key), data_(std::move(data)), next_(nullptr), prev_(nullptr) {};
+        Node(KeyType key, DataType data) : key_(key), data_(std::move(data)), next_(nullptr), prev_(nullptr){};
     };
 
     std::unique_ptr<Node> head_;

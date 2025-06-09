@@ -32,28 +32,20 @@ TEST(LinkedListRemoveTest, RemoveInsideList) {
     ll.Add(2, -2);
     ll.Add(5, -5);
     ll.Add(3, -3);
-    ASSERT_TRUE(ll.GetHead());
-    ASSERT_TRUE(ll.GetTail());
-    ASSERT_EQ(ll.GetHead().value(), std::pair(1, -1));
-    ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));
+    ASSERT_EQ(ll.GetHead().value(), std::pair(1, -1));  // NOLINT
+    ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));  // NOLINT
 
     ll.Remove(2);
-    ASSERT_TRUE(ll.GetHead());
-    ASSERT_TRUE(ll.GetTail());
-    ASSERT_EQ(ll.GetHead().value(), std::pair(1, -1));
-    ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));
+    ASSERT_EQ(ll.GetHead().value(), std::pair(1, -1));  // NOLINT
+    ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));  // NOLINT
 
     ll.Remove(1);
-    ASSERT_TRUE(ll.GetHead());
-    ASSERT_TRUE(ll.GetTail());
-    ASSERT_EQ(ll.GetHead().value(), std::pair(5, -5));
-    ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));
+    ASSERT_EQ(ll.GetHead().value(), std::pair(5, -5));  // NOLINT
+    ASSERT_EQ(ll.GetTail().value(), std::pair(3, -3));  // NOLINT
 
     ll.Remove(3);
-    ASSERT_TRUE(ll.GetHead());
-    ASSERT_TRUE(ll.GetTail());
-    ASSERT_EQ(ll.GetHead().value(), std::pair(5, -5));
-    ASSERT_EQ(ll.GetTail().value(), std::pair(5, -5));
+    ASSERT_EQ(ll.GetHead().value(), std::pair(5, -5));  // NOLINT
+    ASSERT_EQ(ll.GetTail().value(), std::pair(5, -5));  // NOLINT
 
     ll.Remove(5);
     ASSERT_FALSE(ll.GetHead().has_value());
